@@ -13,6 +13,8 @@ import sys
 import urllib
 from urllib.parse import quote
 from urllib.parse import urlencode
+import numpy as np
+import pandas as pd
 
 
 API_KEY= 'ag6RO1gG16UhJzSO-88XdFrpzaNgOpUwaxOkkXco4QvyOXyAdkyih7yGiq5iIGCbZ6rsSPJedkakFpeX0rZGeUfAr7zuWsXkwT6XCZGYSKi2ntPRsJkV00anQCjmW3Yx' 
@@ -29,8 +31,15 @@ SEARCH_LIMIT = 50
 
 zip_summary = {}
 result_list = []
-#category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
-#zipcode_list = [15237, 15235, 15221, 15213, 15236, 15206, 15227, 15212, 15217, 15210, 15216, 15205, 15239, 15241, 15122]
+"""
+category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
+zipcode_list = [15201, 15202, 15204, 15205, 15208, 15210, 15203, 15206, 15207, 15209, 15211, 15214, 15216, 15212, 
+            15213, 15215, 15217, 15218, 15219, 15220, 15222, 15223, 15224, 15226, 15221, 15225, 15227, 15229,
+            15230, 15231, 15233, 15238, 15228, 15232, 15234, 15235, 15236, 15237, 15239, 15240, 15242, 15243, 
+            15253, 15254, 15241, 15244, 15250, 15251, 15252, 15255, 15257, 15258, 15259, 15260, 15261, 15262, 
+            15264, 15270, 15272, 15274, 15279, 15281, 15289, 15290, 15295, 15265, 15267, 15268, 15275, 15276, 
+            15277, 15278, 15282, 15283, 15286]
+"""
 zipcode_list = [15235, 15237, 15232]
 category_list = ['American', 'Asian']
 
@@ -113,8 +122,6 @@ def query_api(term, location):
 
 def addResultsToList(businesses, location, category):
     
-    ##Add responses to a list / dict
-
     for i in businesses:
        value = i.get('location')
        if (int(value.get('zip_code')) == int(location)):
@@ -124,8 +131,17 @@ def addResultsToList(businesses, location, category):
     for i in range(0, len(result_list)):
         i= i +1
 
-  #  for item in result_list:
-  #      print(item)
+
+def resultsToDataFrame():
+    
+    col_names = ['Zip Code', 'Category', 'Name', 'Rating', 'Reviews']
+    df = pd.DataFrame(result_list, columns = col_names)
+    df = df.set_index('Zip Code')
+    print(df)
+    
+    print(df.groupby(['Zip Code', 'Category']).mean())
+        
+    
     
     
 def calculateAverage():
@@ -133,7 +149,7 @@ def calculateAverage():
         count = 0; sumRating = 0; avgRating = 0; sumReviews = 0; resultSummaryList = []
         for category in category_list:
             for result in result_list:
-                if (int(result[0]) == zipcode):
+                if (int(result[0]) == zipcode and result[1] == category):
                     count += 1
                     sumRating = sumRating + float(result[3])
                     sumReviews = sumReviews + int(result[4])
@@ -159,11 +175,10 @@ def main():
                             default=searchZip, type=str,
                             help='Search location (default: %(default)s)')
             input_values = parser.parse_args()
-        
             addResultsToList(query_api(input_values.term, input_values.location), zipcode, category)
-            
+    resultsToDataFrame()    
    # print(len(result_list))
-    calculateAverage()    
+   #calculateAverage()    
     
 if __name__ == '__main__':
     main()
