@@ -7,10 +7,6 @@ Created on Sat Nov 17 00:42:46 2018
 import pandas as pd
 import YelpDataAPI as yd
 
-def main():
-    getYelpData()
-    
-    
 
 def getYelpData():
     df = yd.getData()
@@ -21,4 +17,14 @@ def getYelpData():
     
     print('Printing summary data')
     print(df_summary)
+    
+
+def printDataFrametoCSV(df):
+    df.to_csv('yelpData.csv')
+    
+
+def main():
+    getYelpData()
+    
+    
     

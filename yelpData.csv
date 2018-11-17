@@ -1,0 +1,145 @@
+,zipcode,category,name,rating,review
+0,15213,American,Union Grill,4.0,349
+1,15213,American,Butterjoint,4.0,183
+2,15213,American,Thirsty Scholar Bar & Grille,3.5,15
+3,15213,American,The Great American Grill,3.0,5
+4,15213,American,Panther House Bar & Grill,4.5,4
+5,15213,American,Fuel & Fuddle,3.5,302
+6,15213,American,Fossil Fuels Café,3.5,3
+7,15213,American,Beta Bites,4.0,76
+8,15213,American,The Porch at Schenley,3.5,585
+9,15213,American,Stack'd Burgers & Beer - Oakland,3.5,107
+10,15213,American,Chicken Grille,3.5,21
+11,15213,American,Legume,4.5,374
+12,15213,American,Hemingway's Cafe,3.5,119
+13,15213,American,KBOX Karaoke House,4.0,25
+14,15213,American,Pie For Breakfast,4.0,70
+15,15213,American,The Underground,3.5,3
+16,15213,American,LHAS Café on Seventh,3.0,2
+17,15213,American,Primanti Bros,3.5,294
+18,15213,American,Bruegger's Bagels,3.0,37
+19,15213,American,Pizza Pronto,4.0,22
+20,15213,Asian,Spice Island Tea House,4.0,321
+21,15213,Asian,Oishii Bento,4.0,272
+22,15213,Asian,Zen's Noodle House,3.5,78
+23,15213,Asian,Mount Everest Sushi,4.5,167
+24,15213,Asian,Top Shabu-Shabu & Lounge,3.5,94
+25,15213,Asian,Hunan Bar,4.0,62
+26,15213,Asian,Sichuan Gourmet,4.0,139
+27,15213,Asian,Lulu's Noodles,3.0,393
+28,15213,Asian,Little Asia,3.0,121
+29,15213,Asian,Tong's Cuisine,3.5,45
+30,15213,Asian,Asia Tea House,3.0,50
+31,15213,Asian,Chick'n Bubbly,4.0,131
+32,15213,Asian,Chicken Grille,3.5,21
+33,15213,Asian,Love Yogurt,4.0,47
+34,15213,Asian,Sushi Fuku,4.0,160
+35,15213,Asian,Rose Tea Cafe,2.5,72
+36,15213,Asian,Noodles & Company,3.0,72
+37,15213,Asian,Szechuan Express,3.0,70
+38,15213,Asian,Orient Express,3.0,90
+39,15213,Asian,Korea Garden,3.5,96
+40,15213,Asian,Golden Palace Buffet,3.5,42
+41,15215,American,Caliente Pizza & Drafthouse,2.5,20
+42,15215,American,Tavern In The Wall,3.5,28
+43,15215,American,Sharpsburg Borough of,4.0,1
+44,15215,American,Luke and Mike's Frontporch,3.5,46
+45,15215,American,Jimmy G's,1.0,1
+46,15215,American,Cornerstone Restaurant & Bar,3.5,124
+47,15215,American,Silky's Crows Nest,2.0,36
+48,15213,American,Union Grill,4.0,349
+49,15213,American,Butterjoint,4.0,183
+50,15213,American,Thirsty Scholar Bar & Grille,3.5,15
+51,15213,American,The Great American Grill,3.0,5
+52,15213,American,Panther House Bar & Grill,4.5,4
+53,15213,American,Fuel & Fuddle,3.5,302
+54,15213,American,Fossil Fuels Café,3.5,3
+55,15213,American,Beta Bites,4.0,76
+56,15213,American,The Porch at Schenley,3.5,585
+57,15213,American,Stack'd Burgers & Beer - Oakland,3.5,107
+58,15213,American,Chicken Grille,3.5,21
+59,15213,American,Legume,4.5,374
+60,15213,American,Hemingway's Cafe,3.5,119
+61,15213,American,KBOX Karaoke House,4.0,25
+62,15213,American,Pie For Breakfast,4.0,70
+63,15213,American,The Underground,3.5,3
+64,15213,American,LHAS Café on Seventh,3.0,2
+65,15213,American,Primanti Bros,3.5,294
+66,15213,American,Bruegger's Bagels,3.0,37
+67,15213,American,Pizza Pronto,4.0,22
+68,15213,Asian,Spice Island Tea House,4.0,321
+69,15213,Asian,Oishii Bento,4.0,272
+70,15213,Asian,Zen's Noodle House,3.5,78
+71,15213,Asian,Mount Everest Sushi,4.5,167
+72,15213,Asian,Top Shabu-Shabu & Lounge,3.5,94
+73,15213,Asian,Hunan Bar,4.0,62
+74,15213,Asian,Sichuan Gourmet,4.0,139
+75,15213,Asian,Lulu's Noodles,3.0,393
+76,15213,Asian,Little Asia,3.0,121
+77,15213,Asian,Tong's Cuisine,3.5,45
+78,15213,Asian,Asia Tea House,3.0,50
+79,15213,Asian,Chick'n Bubbly,4.0,131
+80,15213,Asian,Chicken Grille,3.5,21
+81,15213,Asian,Love Yogurt,4.0,47
+82,15213,Asian,Sushi Fuku,4.0,160
+83,15213,Asian,Rose Tea Cafe,2.5,72
+84,15213,Asian,Noodles & Company,3.0,72
+85,15213,Asian,Szechuan Express,3.0,70
+86,15213,Asian,Orient Express,3.0,90
+87,15213,Asian,Korea Garden,3.5,96
+88,15213,Asian,Golden Palace Buffet,3.5,42
+89,15215,American,Caliente Pizza & Drafthouse,2.5,20
+90,15215,American,Tavern In The Wall,3.5,28
+91,15215,American,Sharpsburg Borough of,4.0,1
+92,15215,American,Luke and Mike's Frontporch,3.5,46
+93,15215,American,Jimmy G's,1.0,1
+94,15215,American,Cornerstone Restaurant & Bar,3.5,124
+95,15215,American,Silky's Crows Nest,2.0,36
+96,15213,American,Union Grill,4.0,349
+97,15213,American,Butterjoint,4.0,183
+98,15213,American,Thirsty Scholar Bar & Grille,3.5,15
+99,15213,American,The Great American Grill,3.0,5
+100,15213,American,Panther House Bar & Grill,4.5,4
+101,15213,American,Fuel & Fuddle,3.5,302
+102,15213,American,Fossil Fuels Café,3.5,3
+103,15213,American,Beta Bites,4.0,76
+104,15213,American,The Porch at Schenley,3.5,585
+105,15213,American,Stack'd Burgers & Beer - Oakland,3.5,107
+106,15213,American,Chicken Grille,3.5,21
+107,15213,American,Legume,4.5,374
+108,15213,American,Hemingway's Cafe,3.5,119
+109,15213,American,KBOX Karaoke House,4.0,25
+110,15213,American,Pie For Breakfast,4.0,70
+111,15213,American,The Underground,3.5,3
+112,15213,American,LHAS Café on Seventh,3.0,2
+113,15213,American,Primanti Bros,3.5,294
+114,15213,American,Bruegger's Bagels,3.0,37
+115,15213,American,Pizza Pronto,4.0,22
+116,15213,Asian,Spice Island Tea House,4.0,321
+117,15213,Asian,Oishii Bento,4.0,272
+118,15213,Asian,Zen's Noodle House,3.5,78
+119,15213,Asian,Mount Everest Sushi,4.5,167
+120,15213,Asian,Top Shabu-Shabu & Lounge,3.5,94
+121,15213,Asian,Hunan Bar,4.0,62
+122,15213,Asian,Sichuan Gourmet,4.0,139
+123,15213,Asian,Lulu's Noodles,3.0,393
+124,15213,Asian,Little Asia,3.0,121
+125,15213,Asian,Tong's Cuisine,3.5,45
+126,15213,Asian,Asia Tea House,3.0,50
+127,15213,Asian,Chick'n Bubbly,4.0,131
+128,15213,Asian,Chicken Grille,3.5,21
+129,15213,Asian,Love Yogurt,4.0,47
+130,15213,Asian,Sushi Fuku,4.0,160
+131,15213,Asian,Rose Tea Cafe,2.5,72
+132,15213,Asian,Noodles & Company,3.0,72
+133,15213,Asian,Szechuan Express,3.0,70
+134,15213,Asian,Orient Express,3.0,90
+135,15213,Asian,Korea Garden,3.5,96
+136,15213,Asian,Golden Palace Buffet,3.5,42
+137,15215,American,Caliente Pizza & Drafthouse,2.5,20
+138,15215,American,Tavern In The Wall,3.5,28
+139,15215,American,Sharpsburg Borough of,4.0,1
+140,15215,American,Luke and Mike's Frontporch,3.5,46
+141,15215,American,Jimmy G's,1.0,1
+142,15215,American,Cornerstone Restaurant & Bar,3.5,124
+143,15215,American,Silky's Crows Nest,2.0,36
