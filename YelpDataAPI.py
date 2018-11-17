@@ -31,7 +31,8 @@ SEARCH_LIMIT = 50
 
 zip_summary = {}
 result_list = []
-"""
+
+'''
 category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
 zipcode_list = [15201, 15202, 15204, 15205, 15208, 15210, 15203, 15206, 15207, 15209, 15211, 15214, 15216, 15212, 
             15213, 15215, 15217, 15218, 15219, 15220, 15222, 15223, 15224, 15226, 15221, 15225, 15227, 15229,
@@ -39,8 +40,9 @@ zipcode_list = [15201, 15202, 15204, 15205, 15208, 15210, 15203, 15206, 15207, 1
             15253, 15254, 15241, 15244, 15250, 15251, 15252, 15255, 15257, 15258, 15259, 15260, 15261, 15262, 
             15264, 15270, 15272, 15274, 15279, 15281, 15289, 15290, 15295, 15265, 15267, 15268, 15275, 15276, 
             15277, 15278, 15282, 15283, 15286]
-"""
-zipcode_list = [15235, 15237, 15232]
+'''
+
+zipcode_list = [15213, 15215]
 category_list = ['American', 'Asian']
 
 
@@ -134,51 +136,75 @@ def addResultsToList(businesses, location, category):
 
 def resultsToDataFrame():
     
-    col_names = ['Zip Code', 'Category', 'Name', 'Rating', 'Reviews']
+    col_names = ['zipcode', 'category', 'name', 'rating', 'review']
     df = pd.DataFrame(result_list, columns = col_names)
-    df = df.set_index('Zip Code')
+    df.head()
+    
+    #print(df.groupby(['ZipCode', 'Category']).mean())
+        
+    return df
+    
+    
+def getSummaryData(df):
+  
+    summaryResultList = []
+    
+    for zipcode in zipcode_list:
+        
+        #summary across all restaurant categories in a zip
+        df_filteredAll = df[df.zipcode == str(zipcode)]
+        count = df_filteredAll['rating'].count()
+        ratingAverage = df_filteredAll['rating'].mean()
+        reviewCountAverage = df_filteredAll['review'].mean()
+        summaryResult = [zipcode, 'All', count, ratingAverage, reviewCountAverage]
+        summaryResultList.append(summaryResult)
+        
+        #summary for each category within a zipcode
+        for category in category_list:
+            df_filteredCategories = df[(df.category == category) & (df.zipcode == str(zipcode))]
+            count = df_filteredCategories['rating'].count()
+            ratingAverage = df_filteredCategories['rating'].mean()
+            reviewCountAverage = df_filteredCategories['review'].mean()
+            summaryResult = [zipcode, category, count, ratingAverage, reviewCountAverage]
+            summaryResultList.append(summaryResult)
+            
+    
+    col_names = ['zipcode', 'category', 'count', 'average_rating', 'average_review_count']
+    df_summary = pd.DataFrame(summaryResultList, columns = col_names)
+    
+    return df_summary
+ 
+    
+
+def getData():
+    
+    for zipcode in zipcode_list:
+        for category in category_list:
+                searchZip = str(zipcode)    
+                parser = argparse.ArgumentParser()
+                parser.add_argument('-q', '--term', dest='term', default=category,
+                                type=str, help='Search term (default: %(default)s)')
+                parser.add_argument('-l', '--location', dest='location',
+                                default=searchZip, type=str,
+                                help='Search location (default: %(default)s)')
+                input_values = parser.parse_args()
+                addResultsToList(query_api(input_values.term, input_values.location), zipcode, category)
+    
+    return resultsToDataFrame()
+        
+
+def main():
+   
+    df = getData()
+    df_summary = getSummaryData(df)
+    
+    print('Printing all data')
     print(df)
     
-    print(df.groupby(['Zip Code', 'Category']).mean())
-        
+    print('Printing summary data')
+    print(df_summary)
     
-    
-    
-def calculateAverage():
-    for zipcode in zipcode_list:
-        count = 0; sumRating = 0; avgRating = 0; sumReviews = 0; resultSummaryList = []
-        for category in category_list:
-            for result in result_list:
-                if (int(result[0]) == zipcode and result[1] == category):
-                    count += 1
-                    sumRating = sumRating + float(result[3])
-                    sumReviews = sumReviews + int(result[4])
-            if (count == 0):
-                avgRating = 0
-            else:
-                avgRating = sumRating / count
-            resultSummaryList.extend([category, count, avgRating, sumReviews])
-            zip_summary[zipcode] = resultSummaryList
-            print('Zipcode: ' + str(zipcode) + ' Category: ' + resultSummaryList[0], 'Count: ' + str(resultSummaryList[1]) + ', Avg Rating: ' + "%.2f" % resultSummaryList[2] + ', Total Reviews: ' + str(resultSummaryList[3]))
-       
 
- 
-def main():
-    
-    for category in category_list:
-        for zipcode in zipcode_list:
-            searchZip = str(zipcode)    
-            parser = argparse.ArgumentParser()
-            parser.add_argument('-q', '--term', dest='term', default=category,
-                            type=str, help='Search term (default: %(default)s)')
-            parser.add_argument('-l', '--location', dest='location',
-                            default=searchZip, type=str,
-                            help='Search location (default: %(default)s)')
-            input_values = parser.parse_args()
-            addResultsToList(query_api(input_values.term, input_values.location), zipcode, category)
-    resultsToDataFrame()    
-   # print(len(result_list))
-   #calculateAverage()    
     
 if __name__ == '__main__':
     main()
