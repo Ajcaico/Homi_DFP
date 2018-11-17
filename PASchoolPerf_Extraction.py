@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[128]:
+# In[1]:
 
 
 #Daniel Lesser Public PA School Data import
@@ -10,13 +10,29 @@
 #NotebookApp.rate_limit_window=10.0 (secs)
 import pandas as pd
 
+schools = {}
+#columns = []
+AlleghenyZipcodes = {'15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
+                 '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
+                 '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
+                 '15047','15049','15120','15126','15051','15642','15056','16046','15057','15136',
+                 '15131','15132','15133','15135','15063','15146','15064','15668','15065','15068',
+                 '15137','15071','15139','15140','15201','15202','15203','15204','15205','15206',
+                 '15207','15208','15209','15210','15211','15212','15213','15214','15215','15216',
+                 '15217','15218','15219','15220','15221','15222','15223','15224','15225','15226',
+                 '15227','15228','15229','15232','15233','15234','15235','15236','15237','15238',
+                 '15239','15241','15243','15260','15290','15142','15075','15076','16055','15143',
+                 '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
+                 '15122','15089','15090','15148'}
+SchoolComplete = []
+AlleghenySchools = {}
+AlleghenySchoolZipAgg = {}
 
 def ReadFiles_M():
     fin = open("SPP.APD.2016.2017.txt", "rt", encoding = 'utf-8')
     if(fin.mode == 'rt'):
         header = next(fin) #grabs header line
         headerRow = header.rstrip('\n').split("|")
-        columns.extend([headerRow[0], headerRow[1], headerRow[2], headerRow[3]])
         counter = 0
         TotalRows = 0
         for line in fin:      # read file line by line, search, and write table attributes to tuple
@@ -24,11 +40,9 @@ def ReadFiles_M():
                 school = []
                 row = line.rstrip('\n').split("|")
                 school.extend([row[0], row[1], row[2], row[3], row[5]])  
-                columns.append(row[4])
                 counter+=1
             elif (counter <45): #grabs and appends all attributes in APD file to school list
                 row = line.rstrip('\n').split("|")
-                #columns.append(row[4]) #throwing iopub error... need to resolve before adding back in
                 school.append(row[5])
                 counter+=1
             else: #at end of school, adds the school to the dictionary and starts over again
@@ -36,7 +50,6 @@ def ReadFiles_M():
                 school = []
                 row = line.rstrip('\n').split("|")
                 school.extend([row[0], row[1], row[2], row[3], row[5]])
-                #columns.append(row[4])
                 counter = 1
             TotalRows+=1
 
@@ -107,7 +120,6 @@ def SchoolListList_M():
 
 def ZipAgg_M():
     #method for giving 1 row per zip code of all relevant attributes.
-    AlleghenySchoolZipAgg = {}
 
     for zip in AlleghenyZipcodes:
         localSchools = {}
@@ -396,32 +408,15 @@ def ReturnAggregate():
     return pd.DataFrame(AlleghenySchoolZipAgg).T
 
 #Main Method
-
-schools = {}
-columns = []
-AlleghenyZipcodes = {'15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
-                 '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
-                 '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
-                 '15047','15049','15120','15126','15051','15642','15056','16046','15057','15136',
-                 '15131','15132','15133','15135','15063','15146','15064','15668','15065','15068',
-                 '15137','15071','15139','15140','15201','15202','15203','15204','15205','15206',
-                 '15207','15208','15209','15210','15211','15212','15213','15214','15215','15216',
-                 '15217','15218','15219','15220','15221','15222','15223','15224','15225','15226',
-                 '15227','15228','15229','15232','15233','15234','15235','15236','15237','15238',
-                 '15239','15241','15243','15260','15290','15142','15075','15076','16055','15143',
-                 '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
-                 '15122','15089','15090','15148'}
-SchoolComplete = []
-AlleghenySchools = {}
-
-ReadFiles_M()
-NarrowAllegheny_M()
-SchoolListList_M()
-ZipAgg_M()
-printToExcel_M()
+def SchoolMainMethod_M():
+    ReadFiles_M()
+    NarrowAllegheny_M()
+    SchoolListList_M()
+    ZipAgg_M()
+    printToExcel_M()
 
 
-# In[105]:
+# In[ ]:
 
 
 ##openpyxl version.  Pandas a lot easier!
@@ -448,13 +443,13 @@ printToExcel_M()
 #wb[ws1]['B4'] = "testing"
 
 
-# In[107]:
+# In[3]:
 
 
+SchoolMainMethod_M()
 
 
-
-# In[118]:
+# In[ ]:
 
 
 
