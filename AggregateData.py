@@ -4,22 +4,19 @@ Created on Sat Nov 17 00:42:46 2018
 
 @author: ajcai
 """
-import pandas as pd
+##import each .py file
 import YelpDataAPI as yd
 
 
-def getYelpData():
-    df = yd.getData()
-    df_summary = yd.getSummaryData(df)
+def getData():
     
-    print('Printing all data')
-    print(df)
-    
-    print('Printing summary data')
-    print(df_summary)
+#Call functions from each .py file to get data
+    df_yelp = yd.getData() #returns all yelp data
+    df_yelpSummary = yd.getSummaryData(df_yelp) #returns summary by zip and category
     
 
-def printDataFrametoCSV(df):
+
+def dataFrametoCSV(df):
     df.to_csv('yelpData.csv')
     
 
@@ -27,5 +24,8 @@ def main():
     getYelpData()
     
     
+    
+    
+
 if __name__ == '__main__':
     main()

@@ -119,30 +119,25 @@ def query_api(term, location):
         return
     
     business_id = businesses[0]['id']
-
-#    print(u'{0} businesses found, querying business info ' \
-#        'for the top result "{1}" ...'.format(
-#            len(businesses), business_id))
     response = get_business(API_KEY, business_id)
-#   print(u'Result for business "{0}" found:'.format(business_id))
-#    pprint.pprint(response, indent=2)
 
     return businesses
 
 def addResultsToList(businesses, location, category):
     
+    
     for i in businesses:
-                
        value = i.get('location')
-       print (location)
-       print (int(value.get('zip_code')))
-       if (int(value.get('zip_code')) == int(location)):
-          result = [value.get('zip_code'), category, i.get('name'), i.get('rating'), i.get('review_count') ]
+
+       if value.get('zip_code') == '':
+           businessZip = int(location)
+       else:
+           businessZip = int(value.get('zip_code')) 
+
+       if (businessZip == int(location)):
+          result = [businessZip, category, i.get('name'), i.get('rating'), i.get('review_count') ]
           result_list.append(result)
        
-    for i in range(0, len(result_list)):
-        i= i +1
-
 
 def resultsToDataFrame():
     
@@ -162,7 +157,7 @@ def getSummaryData(df):
     for zipcode in zipcode_list:
         
         #summary across all restaurant categories in a zip
-        df_filteredAll = df[df.zipcode == str(zipcode)]
+        df_filteredAll = df[str(df.zipcode) == str(zipcode)]
         count = df_filteredAll['rating'].count()
         ratingAverage = df_filteredAll['rating'].mean()
         reviewCountAverage = df_filteredAll['review'].mean()
