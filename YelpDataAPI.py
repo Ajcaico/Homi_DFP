@@ -27,14 +27,15 @@ BUSINESS_PATH = '/v3/businesses/'  # Business ID will come after slash.
 # Defaults for our simple example.
 ##DEFAULT_TERM = 'american'
 ##DEFAULT_LOCATION = '15232'
-SEARCH_LIMIT = 50
+SEARCH_LIMIT = 40
 
 zip_summary = {}
 result_list = []
 
 
 category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
-'''
+
+
 zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
                  '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
                  '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
@@ -47,9 +48,9 @@ zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104',
                  '15239','15241','15243','15260','15290','15142','15075','15076','16055','15143',
                  '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
                  '15122','15089','15090','15148']
-'''
 
-zipcode_list = [15108]
+
+#zipcode_list = [15222, 15203, 15044, 15131]
 #category_list = ['American', 'Asian']
 
 
@@ -72,7 +73,7 @@ def request(host, path, api_key, url_params=None):
         'Authorization': 'Bearer %s' % api_key,
     }
 
-    print(u'Querying {0} ...'.format(url))
+   # print(u'Querying {0} ...'.format(url))
     response = requests.request('GET', url, headers=headers, params=url_params)
     return response.json()
 
@@ -125,19 +126,19 @@ def query_api(term, location):
 
 def addResultsToList(businesses, location, category):
     
+    if businesses is not None:
+        for i in businesses:
+           value = i.get('location')
     
-    for i in businesses:
-       value = i.get('location')
-
-       if value.get('zip_code') == '':
-           businessZip = int(location)
-       else:
-           businessZip = int(value.get('zip_code')) 
-
-       if (businessZip == int(location)):
-          result = [businessZip, category, i.get('name'), i.get('rating'), i.get('review_count') ]
-          result_list.append(result)
-       
+           if value.get('zip_code') == '':
+               businessZip = int(location)
+           else:
+               businessZip = int(value.get('zip_code')) 
+    
+           if (businessZip == int(location)):
+              result = [businessZip, category, i.get('name'), i.get('rating'), i.get('review_count') ]
+              result_list.append(result)
+           
 
 def resultsToDataFrame():
     
@@ -157,16 +158,16 @@ def getSummaryData(df):
     for zipcode in zipcode_list:
         
         #summary across all restaurant categories in a zip
-        df_filteredAll = df[str(df.zipcode) == str(zipcode)]
+        df_filteredAll = df[(df.category != 'Bar') & (df.category != 'Grocery') & (df.zipcode == int(zipcode))]
         count = df_filteredAll['rating'].count()
         ratingAverage = df_filteredAll['rating'].mean()
         reviewCountAverage = df_filteredAll['review'].mean()
-        summaryResult = [zipcode, 'All', count, ratingAverage, reviewCountAverage]
+        summaryResult = [zipcode, 'All Restaurants', count, ratingAverage, reviewCountAverage]
         summaryResultList.append(summaryResult)
         
         #summary for each category within a zipcode
         for category in category_list:
-            df_filteredCategories = df[(df.category == category) & (df.zipcode == str(zipcode))]
+            df_filteredCategories = df[(df.category == category) & (df.zipcode == int(zipcode))]
             count = df_filteredCategories['rating'].count()
             ratingAverage = df_filteredCategories['rating'].mean()
             reviewCountAverage = df_filteredCategories['review'].mean()
@@ -179,11 +180,52 @@ def getSummaryData(df):
     
     return df_summary
  
+
+
+def calculateRating(df, df_summary):
     
+    ratings = []
+    #determine variety of restuarant types
+    for zipcode in zipcode_list:
+        df_filtered = df[df.zipcode == int(zipcode)]
+        counts = df_filtered['category'].value_counts().to_dict()
+        print(counts)
+        
+        highestPercent = 0; variety = 0;
+        for category, count in counts.items():
+            if (category != 'Bar' and category != 'Grocery'):
+                totalCount = df_filtered[(df.category != 'Bar') & (df.category != 'Grocery')]['category'].count()
+                percent = count / totalCount
+                if (percent > highestPercent):
+                    highestPercent = percent
+            
+            variety = 5 - ((highestPercent - 0.25) * 5)
+        
+        df_summaryFiltered = df_summary[(df_summary.zipcode == int(zipcode)) & ((df_summary.category == 'All Restaurants'))]
+        quality = df_summaryFiltered['average_rating'].mean()
+        
+        df_summaryBar = df_summary[(df_summary.zipcode == int(zipcode)) & ((df_summary.category == 'Bar'))]
+        bar = df_summaryBar['average_rating'].mean() * df_summaryBar['count'].sum()
+        
+        df_summaryGrocery = df_summary[(df_summary.zipcode == int(zipcode)) & ((df_summary.category == 'Grocery'))]
+        grocery = df_summaryGrocery['average_rating'].mean() * df_summaryGrocery['count'].sum()
+        
+        rating = [zipcode, variety, quality, bar, grocery]
+        ratings.append(rating)
+       
+    col_names = ['zipcode', 'variety', 'quality', 'bar', 'grocery']
+    df_ratings = pd.DataFrame(ratings, columns = col_names)
+    
+    print(df_ratings)
+    df_ratings.to_csv('YelpOverallRating.csv')
+    return df_ratings
+
+
 
 def getData():
     
     for zipcode in zipcode_list:
+        print(zipcode)
         for category in category_list:
                 searchZip = str(zipcode)    
                 parser = argparse.ArgumentParser()
@@ -202,6 +244,7 @@ def main():
    
     df = getData()
     df_summary = getSummaryData(df)
+    calculateRating(df, df_summary)
     
     print('Printing all data')
     print(df)
