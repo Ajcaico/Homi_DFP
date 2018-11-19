@@ -6,8 +6,6 @@ Created on Fri Nov  9 19:02:49 2018
 """
 from __future__ import print_function
 import argparse
-import json
-import pprint
 import requests
 import sys
 import urllib
@@ -145,8 +143,6 @@ def resultsToDataFrame():
     col_names = ['zipcode', 'category', 'name', 'rating', 'review']
     df = pd.DataFrame(result_list, columns = col_names)
     df.head()
-    
-    #print(df.groupby(['ZipCode', 'Category']).mean())
         
     return df
     
