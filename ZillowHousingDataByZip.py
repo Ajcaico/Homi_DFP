@@ -16,6 +16,7 @@ import pandas as pd
 import os
 import platform
 import datetime
+import numpy as np
 
 zillowPriceDict = {}
 zipCodeList = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
@@ -37,10 +38,10 @@ zipCodeList = ['15101','15003','15005','15006','15007','15102','15014','15104','
 # index 2: rental price / square foot
 # index 3: yet to be filled
 for z in zipCodeList:
-    zillowPriceDict[str(z)] = {'medSalePPSF': -1,'medSale1Bed': -1,'medSale2Bed':-1,'medSale3Bed':-1,
-                        'medSale4Bed':-1,'medSale5pBed': -1,
-                        'medRentPPSF': -1,'medRent1Bed': -1,'medRent2Bed': -1,'medRent3Bed': -1,
-                        'medRent4Bed': -1,'medRent5pBed': -1}
+    zillowPriceDict[str(z)] = {'medSalePPSF': np.nan,'medSale1Bed': np.nan,'medSale2Bed':np.nan,'medSale3Bed':np.nan,
+                        'medSale4Bed':np.nan,'medSale5pBed': np.nan}
+#                        'medRentPPSF': -1,'medRent1Bed': -1,'medRent2Bed': -1,'medRent3Bed': -1,
+#                        'medRent4Bed': -1,'medRent5pBed': -1}
 
 
 #check creation date of file, system time function
@@ -130,52 +131,52 @@ with open('Zip\\Zip_Zhvi_5BedroomOrMore.csv') as csv_file:
             
 #getting Rental prices and saving them to dictionary
 # rent price per sqft
-with open('Zip\\Zip_ZriPerSqft_AllHomes.csv') as csv_file:
-    csv_reader = csv.DictReader(csv_file)
-    for row in csv_reader: 
-        if row['State'] == 'PA':
-            if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medRentPPSF'] = row['2018-09']
-                
-# med sale of 1 bed
-with open('Zip\\Zip_MedianRentalPrice_1Bedroom.csv') as csv_file:
-    csv_reader = csv.DictReader(csv_file)
-    for row in csv_reader: 
-        if row['State'] == 'PA':
-            if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medRent1Bed'] = row['2018-09']
-
-# med sale of 2 bed
-with open('Zip\\Zip_MedianRentalPrice_2Bedroom.csv') as csv_file:
-    csv_reader = csv.DictReader(csv_file)
-    for row in csv_reader: 
-        if row['State'] == 'PA':
-            if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medRent2Bed'] = row['2018-09']
-
-# med sale of 3 bed
-with open('Zip\\Zip_MedianRentalPrice_3Bedroom.csv') as csv_file:
-    csv_reader = csv.DictReader(csv_file)
-    for row in csv_reader: 
-        if row['State'] == 'PA':
-            if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medRent3Bed'] = row['2018-09']
-
-# med sale of 4 bed
-with open('Zip\\Zip_MedianRentalPrice_4Bedroom.csv') as csv_file:
-    csv_reader = csv.DictReader(csv_file)
-    for row in csv_reader: 
-        if row['State'] == 'PA':
-            if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medRent4Bed'] = row['2018-09']
-                
-# med sale of 5 plus beds
-with open('Zip\\Zip_MedianRentalPrice_5BedroomOrMore.csv') as csv_file:
-    csv_reader = csv.DictReader(csv_file)
-    for row in csv_reader: 
-        if row['State'] == 'PA':
-            if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medRent5pBed'] = row['2018-09']
+#with open('Zip\\Zip_ZriPerSqft_AllHomes.csv') as csv_file:
+#    csv_reader = csv.DictReader(csv_file)
+#    for row in csv_reader: 
+#        if row['State'] == 'PA':
+#            if row['RegionName'] in zillowPriceDict:
+#                zillowPriceDict[row['RegionName']]['medRentPPSF'] = row['2018-09']
+#  ##              
+## med sale of 1 bed
+#with open('Zip\\Zip_MedianRentalPrice_1Bedroom.csv') as csv_file:
+#    csv_reader = csv.DictReader(csv_file)
+#    for row in csv_reader: 
+#        if row['State'] == 'PA':
+#            if row['RegionName'] in zillowPriceDict:
+#                zillowPriceDict[row['RegionName']]['medRent1Bed'] = row['2018-09']
+#
+## med sale of 2 bed
+#with open('Zip\\Zip_MedianRentalPrice_2Bedroom.csv') as csv_file:
+#    csv_reader = csv.DictReader(csv_file)
+#    for row in csv_reader: 
+#        if row['State'] == 'PA':
+#            if row['RegionName'] in zillowPriceDict:
+#                zillowPriceDict[row['RegionName']]['medRent2Bed'] = row['2018-09']
+#
+## med sale of 3 bed
+#with open('Zip\\Zip_MedianRentalPrice_3Bedroom.csv') as csv_file:
+#    csv_reader = csv.DictReader(csv_file)
+#    for row in csv_reader: 
+#        if row['State'] == 'PA':
+#            if row['RegionName'] in zillowPriceDict:
+#                zillowPriceDict[row['RegionName']]['medRent3Bed'] = row['2018-09']
+#
+## med sale of 4 bed
+#with open('Zip\\Zip_MedianRentalPrice_4Bedroom.csv') as csv_file:
+#    csv_reader = csv.DictReader(csv_file)
+#    for row in csv_reader: 
+#        if row['State'] == 'PA':
+#            if row['RegionName'] in zillowPriceDict:
+#                zillowPriceDict[row['RegionName']]['medRent4Bed'] = row['2018-09']
+#                
+## med sale of 5 plus beds
+#with open('Zip\\Zip_MedianRentalPrice_5BedroomOrMore.csv') as csv_file:
+#    csv_reader = csv.DictReader(csv_file)
+#    for row in csv_reader: 
+#        if row['State'] == 'PA':
+#            if row['RegionName'] in zillowPriceDict:
+#                zillowPriceDict[row['RegionName']]['medRent5pBed'] = row['2018-09']
 
 #convert dictionary to dataframe
 df = pd.DataFrame(zillowPriceDict).T
