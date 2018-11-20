@@ -34,21 +34,21 @@ result_list = []
 category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
 
 
-zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
-                 '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
-                 '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
-                 '15047','15049','15120','15126','15051','15642','15056','16046','15057','15136',
-                 '15131','15132','15133','15135','15063','15146','15064','15668','15065','15068',
-                 '15137','15071','15139','15140','15201','15202','15203','15204','15205','15206',
-                 '15207','15208','15209','15210','15211','15212','15213','15214','15215','15216',
-                 '15217','15218','15219','15220','15221','15222','15223','15224','15225','15226',
-                 '15227','15228','15229','15232','15233','15234','15235','15236','15237','15238',
-                 '15239','15241','15243','15260','15290','15142','15075','15076','16055','15143',
-                 '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
-                 '15122','15089','15090','15148']
+zipcode_list = [15101,15003,15005,15006,15007,15102,15014,15104,15015,15017,
+                 15018,15020,15106,15024,15025,15026,15108,15028,15030,15046,
+                 15031,15034,15110,15035,15112,15037,15332,15044,15045,15116,
+                 15047,15049,15120,15126,15051,15642,15056,16046,15057,15136,
+                 15131,15132,15133,15135,15063,15146,15064,15668,15065,15068,
+                 15137,15071,15139,15140,15201,15202,15203,15204,15205,15206,
+                 15207,15208,15209,15210,15211,15212,15213,15214,15215,15216,
+                 15217,15218,15219,15220,15221,15222,15223,15224,15225,15226,
+                 15227,15228,15229,15232,15233,15234,15235,15236,15237,15238,
+                 15239,15241,15243,15260,15290,15142,15075,15076,16055,15143,
+                 15129,15144,15082,15084,15085,15145,16059,15147,15086,15088,
+                 15122,15089,15090,15148]
 
 
-#zipcode_list = [15222, 15203, 15044, 15131]
+#zipcode_list = [15222, 15232 ]
 #category_list = ['American', 'Asian']
 
 
@@ -185,7 +185,7 @@ def calculateRating(df, df_summary):
     for zipcode in zipcode_list:
         df_filtered = df[df.zipcode == int(zipcode)]
         counts = df_filtered['category'].value_counts().to_dict()
-        print(counts)
+        
         
         highestPercent = 0; variety = 0;
         for category, count in counts.items():
@@ -194,7 +194,7 @@ def calculateRating(df, df_summary):
                 percent = count / totalCount
                 if (percent > highestPercent):
                     highestPercent = percent
-            
+                    
             variety = 5 - ((highestPercent - 0.25) * 5)
         
         df_summaryFiltered = df_summary[(df_summary.zipcode == int(zipcode)) & ((df_summary.category == 'All Restaurants'))]
@@ -212,7 +212,6 @@ def calculateRating(df, df_summary):
     col_names = ['zipcode', 'variety', 'quality', 'bar', 'grocery']
     df_ratings = pd.DataFrame(ratings, columns = col_names)
     
-    print(df_ratings)
     df_ratings.to_csv('YelpOverallRating.csv')
     return df_ratings
 
@@ -220,19 +219,26 @@ def calculateRating(df, df_summary):
 
 def getData():
     
-    for zipcode in zipcode_list:
-        print(zipcode)
-        for category in category_list:
-                searchZip = str(zipcode)    
-                parser = argparse.ArgumentParser()
-                parser.add_argument('-q', '--term', dest='term', default=category,
-                                type=str, help='Search term (default: %(default)s)')
-                parser.add_argument('-l', '--location', dest='location',
-                                default=searchZip, type=str,
-                                help='Search location (default: %(default)s)')
-                input_values = parser.parse_args()
-                addResultsToList(query_api(input_values.term, input_values.location), zipcode, category)
+    print('Starting Yelp API requests')
+    totalRequests = len(zipcode_list) * len(category_list)
+    print(str(totalRequests) + ' API requests will be made')
     
+    count = 0
+    for zipcode in zipcode_list:
+        for category in category_list:
+            count += 1
+            print('Making request number: ' + str(count))
+            searchZip = str(zipcode)    
+            parser = argparse.ArgumentParser()
+            parser.add_argument('-q', '--term', dest='term', default=category,
+                            type=str, help='Search term (default: %(default)s)')
+            parser.add_argument('-l', '--location', dest='location',
+                            default=searchZip, type=str,
+                            help='Search location (default: %(default)s)')
+            input_values = parser.parse_args()
+            addResultsToList(query_api(input_values.term, input_values.location), zipcode, category)
+    
+    print('Done!')
     return resultsToDataFrame()
         
 
@@ -241,13 +247,7 @@ def main():
     df = getData()
     df_summary = getSummaryData(df)
     calculateRating(df, df_summary)
-    
-    print('Printing all data')
-    print(df)
-    
-    print('Printing summary data')
-    print(df_summary)
-    
+
 
     
 if __name__ == '__main__':
