@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[170]:
+# In[173]:
 
 
 import requests, zipfile, io, csv
@@ -80,6 +80,8 @@ dfM = dfM.merge(df3, how='left', on='ZIPCODE')
 dfM = dfM.merge(df4, how='left', on='ZIPCODE')
 dfM = dfM.merge(df5, how='left', on='ZIPCODE')
 dfM = dfM.merge(df6, how='left', on='ZIPCODE')
+
+dfM = dfM.set_index('ZIPCODE')
 
 dfM.to_excel('AggregatedPittsburghCrimeData.xlsx')
 
