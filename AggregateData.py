@@ -17,14 +17,10 @@ def getData():
 #    df_yelpSummaryTop.to_excel('df_yelpSummaryTop.xlsx')
 
 
-
     
     #DataFrames to use for aggregation
     df_yelpSummaryTop = pd.read_excel('df_yelpSummaryTop.xlsx')
     df_yelpSummaryTop = df_yelpSummaryTop.set_index('zipcode')
-   # df_yelpSummaryTop = df_yelpSummaryTop.index.astype(str, copy = True)
-    print(type(df_yelpSummaryTop))
-    #df_yelpSummaryTop.to_excel('troubleshootYelp.xlsx')
     
     df_craigslistSummary = craig.getData()
     df_zillowSummary = zillow.zillowData()
@@ -39,11 +35,6 @@ def getData():
         
     result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop, df_arrests], axis=1, join='outer')
     result.to_excel('Result.xlsx')
-
-#Print to CSV
-#    df_yelp.to_csv('AllYelpData.csv')
-#    df_yelpSummary.to_csv('SummaryYelpDataTEST.csv')
-#    df_yelpOverallRating.to_csv('YelpOverallRating.csv')
 
 
     
