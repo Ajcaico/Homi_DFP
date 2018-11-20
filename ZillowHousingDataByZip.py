@@ -73,10 +73,10 @@ lastLoaded = creation_date('Zip\\Zip_MedianValuePerSqft_AllHomes.csv')
 if (yesterday > lastLoaded):
     print(lastLoaded)
     print(yesterday)
-#     zipUrl = 'http://files.zillowstatic.com/research/public/Zip.zip'
-#     r = requests.get(zipUrl)
-#     z = zipfile.ZipFile(io.BytesIO(r.content))
-#     z.extractall()
+    zipUrl = 'http://files.zillowstatic.com/research/public/Zip.zip'
+    r = requests.get(zipUrl)
+    z = zipfile.ZipFile(io.BytesIO(r.content))
+    z.extractall()
 
     
     
