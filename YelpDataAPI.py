@@ -15,7 +15,10 @@ import numpy as np
 import pandas as pd
 
 
-API_KEY= 'ag6RO1gG16UhJzSO-88XdFrpzaNgOpUwaxOkkXco4QvyOXyAdkyih7yGiq5iIGCbZ6rsSPJedkakFpeX0rZGeUfAr7zuWsXkwT6XCZGYSKi2ntPRsJkV00anQCjmW3Yx' 
+#API_KEY= 'ag6RO1gG16UhJzSO-88XdFrpzaNgOpUwaxOkkXco4QvyOXyAdkyih7yGiq5iIGCbZ6rsSPJedkakFpeX0rZGeUfAr7zuWsXkwT6XCZGYSKi2ntPRsJkV00anQCjmW3Yx' 
+
+API_KEY = 'Zuso4ntCFv_QaB4i4a6K4j0R0meRcdJ6Lum873qy36Y6gN2diK9iCLlnqFX-GYtWH5fSN-I8NUFYhTyTcx8PhamgxYkCSD4MkmJ4lzTasDn99cWZjV9f9bgLFHD0W3Yx'
+
 
 # API constants, you shouldn't have to change these.
 API_HOST = 'https://api.yelp.com'
@@ -23,9 +26,7 @@ SEARCH_PATH = '/v3/businesses/search'
 BUSINESS_PATH = '/v3/businesses/'  # Business ID will come after slash.
 
 # Defaults for our simple example.
-##DEFAULT_TERM = 'american'
-##DEFAULT_LOCATION = '15232'
-SEARCH_LIMIT = 40
+SEARCH_LIMIT = 35
 
 zip_summary = {}
 result_list = []
@@ -173,8 +174,9 @@ def getSummaryData(df):
     
     col_names = ['zipcode', 'category', 'count', 'average_rating', 'average_review_count']
     df_summary = pd.DataFrame(summaryResultList, columns = col_names)
-    df_summary = df_summary['zipcode'].apply(str)
-    
+ #   df_summary = df_summary.set_index('zipcode')
+  #  df_summary = df_summary['zipcode'].apply(str)
+    print(df_summary)
     
     return df_summary
  
