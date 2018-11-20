@@ -71,8 +71,9 @@ lastLoaded = creation_date('Zip\\Zip_MedianValuePerSqft_AllHomes.csv')
 
 # extract zip from zillow to folder once a day
 if (yesterday > lastLoaded):
-    print(lastLoaded)
-    print(yesterday)
+    print("Zillow data file last update: ",lastLoaded)
+    print("More than 24 hours since last update")
+    print("Updating file...")
     zipUrl = 'http://files.zillowstatic.com/research/public/Zip.zip'
     r = requests.get(zipUrl)
     z = zipfile.ZipFile(io.BytesIO(r.content))
