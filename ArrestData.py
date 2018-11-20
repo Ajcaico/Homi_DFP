@@ -83,7 +83,13 @@ dfM = dfM.merge(df6, how='left', on='ZIPCODE')
 
 dfM = dfM.set_index('ZIPCODE')
 
-dfM.to_excel('AggregatedPittsburghCrimeData.xlsx')
+def arrestData():
+    return dfM
+
+
+if __name__ == '__main__':         
+    # write dictionary to csv
+    dfM.to_excel('AggregatedPittsburghCrimeData.xlsx')
 
 
 # In[ ]:

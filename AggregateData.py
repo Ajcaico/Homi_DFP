@@ -3,6 +3,7 @@ import pandas as pd
 import YelpDataAPI as yd
 import CraigslistCode as craig
 import ZillowHousingDataByZip as zillow
+import ArrestData as arrests
 
 def getData(): 
 #Call functions from each .py file to get data
@@ -18,16 +19,18 @@ def getData():
     df_yelpSummaryTop = pd.read_csv('df_yelpSummaryTop.csv')
     df_craigslistSummary = craig.getData()
     df_zillowSummary = zillow.zillowData()
+    df_arrests = arrests.arrestData()
     
     # checking size of dataFRames to be combined
     print("zillow df size: ", df_zillowSummary.shape, "\n")
     print("craigslist df size: ", df_craigslistSummary.shape, "\n")
     print("Yelp df size: ", df_yelpSummaryTop.shape, "\n")
+    print("Arrests df size: ", df_arrests.shape, "\n")
     print()
     
     
     
-    result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop], axis=1, join='inner')
+    result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop, df_arrests], axis=1, join='outer')
     result.to_excel('Result.xlsx')
 
 #Print to CSV
