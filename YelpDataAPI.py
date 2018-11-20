@@ -173,6 +173,8 @@ def getSummaryData(df):
     
     col_names = ['zipcode', 'category', 'count', 'average_rating', 'average_review_count']
     df_summary = pd.DataFrame(summaryResultList, columns = col_names)
+    df_summary = df_summary['zipcode'].apply(str)
+    
     
     return df_summary
  

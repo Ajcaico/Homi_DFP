@@ -17,6 +17,8 @@ def getData():
     
     #DataFrames to use for aggregation
     df_yelpSummaryTop = pd.read_csv('df_yelpSummaryTop.csv')
+    df_yelpSummaryTop.to_excel('troubleshootYelp.xlsx')
+    df_yelpSummaryTop = df_yelpSummaryTop['zipcode'].apply(str)
     df_craigslistSummary = craig.getData()
     df_zillowSummary = zillow.zillowData()
     df_arrests = arrests.arrestData()
@@ -34,22 +36,22 @@ def getData():
     result.to_excel('Result.xlsx')
 
 #Print to CSV
-   # df_yelp.to_csv('AllYelpData.csv')
-   # df_yelpSummary.to_csv('SummaryYelpDataTEST.csv')
-   # df_yelpOverallRating.to_csv('YelpOverallRating.csv')
-   # df_yelpSummaryTop.to_csv('df_yelpSummaryTop.csv')
+#    df_yelp.to_csv('AllYelpData.csv')
+#    df_yelpSummary.to_csv('SummaryYelpDataTEST.csv')
+#    df_yelpOverallRating.to_csv('YelpOverallRating.csv')
+#    df_yelpSummaryTop.to_csv('df_yelpSummaryTop.csv')
     
 def getDataFromCSV():
     #get data from last CSV/Excel file created instead of pulling directly from online source
-   # df_yelp = pd.read_csv('AllYelpData.csv')
-   # df_yelpSummary = pd.read_csv('SummaryYelpData.csv')
-   # df_yelpOverallRating = pd.read_csv('YelpOverallRating.csv')
+#    df_yelp = pd.read_csv('AllYelpData.csv')
+#    df_yelpSummary = pd.read_csv('SummaryYelpData.csv')
+#    df_yelpOverallRating = pd.read_csv('YelpOverallRating.csv')
    
     df_yelpSummaryTop = pd.read_csv('df_yelpSummaryTop.csv')
     
 def main():
     getData()
-    getDataFromCSV()
+    #getDataFromCSV()
       
 if __name__ == '__main__':
     main()
