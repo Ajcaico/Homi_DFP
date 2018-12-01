@@ -32,10 +32,8 @@ zip_summary = {}
 result_list = []
 
 
-#category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
+category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
 
-
-'''
 zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
                 '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
                 '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
@@ -48,9 +46,9 @@ zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104',
                 '15239','15241','15243','15260','15290','15142','15075','15076','16055','15143',
                 '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
                 '15122','15089','15090','15148']
-'''
-zipcode_list = ['15222', '15232' ]
-category_list = ['American', 'Asian']
+
+#zipcode_list = ['15222', '15232' ]
+#category_list = ['American', 'Asian']
 
 
 def request(host, path, api_key, url_params=None):
@@ -152,14 +150,17 @@ def resultsToDataFrame():
     
 def getSummaryData(df):
   
-    summaryResultList = []
+    summaryResultList = []   
+    df['zipcode'] = (df['zipcode']).astype(int)
+    
+    
     
     for zipcode in zipcode_list:
         
         #summary across all restaurant categories in a zip
 
-        df['zipcode'] = (df['zipcode']).astype(int)
-        df_filteredAll = df[(df.category != 'Bar') & (df.category != 'Grocery') & (df.zipcode == int(zipcode))]
+       
+        df_filteredAll = df[(df.category != 'Bar') & (df.category != 'Grocery') & (df.zipcode == int(zipcode))] 
         count = df_filteredAll['rating'].count()
         ratingAverage = df_filteredAll['rating'].mean()
         reviewCountAverage = df_filteredAll['review'].mean()
@@ -267,8 +268,8 @@ def main():
  
 
     df = getData()
-    df_summary = getSummaryData(df)
-    calculateRating(df, df_summary)
+  #  df_summary = getSummaryData(df)
+ #   calculateRating(df, df_summary)
      
     getDatafromExcel()
     
