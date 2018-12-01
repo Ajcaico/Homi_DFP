@@ -32,25 +32,25 @@ zip_summary = {}
 result_list = []
 
 
-category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
+#category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
 
 
-zipcode_list = [15101,15003,15005,15006,15007,15102,15014,15104,15015,15017,
-                 15018,15020,15106,15024,15025,15026,15108,15028,15030,15046,
-                 15031,15034,15110,15035,15112,15037,15332,15044,15045,15116,
-                 15047,15049,15120,15126,15051,15642,15056,16046,15057,15136,
-                 15131,15132,15133,15135,15063,15146,15064,15668,15065,15068,
-                 15137,15071,15139,15140,15201,15202,15203,15204,15205,15206,
-                 15207,15208,15209,15210,15211,15212,15213,15214,15215,15216,
-                 15217,15218,15219,15220,15221,15222,15223,15224,15225,15226,
-                 15227,15228,15229,15232,15233,15234,15235,15236,15237,15238,
-                 15239,15241,15243,15260,15290,15142,15075,15076,16055,15143,
-                 15129,15144,15082,15084,15085,15145,16059,15147,15086,15088,
-                 15122,15089,15090,15148]
-
-
-#zipcode_list = [15222, 15232 ]
-#category_list = ['American', 'Asian']
+'''
+zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
+                '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
+                '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
+                '15047','15049','15120','15126','15051','15642','15056','16046','15057','15136',
+                '15131','15132','15133','15135','15063','15146','15064','15668','15065','15068',
+                '15137','15071','15139','15140','15201','15202','15203','15204','15205','15206',
+                '15207','15208','15209','15210','15211','15212','15213','15214','15215','15216',
+                '15217','15218','15219','15220','15221','15222','15223','15224','15225','15226',
+                '15227','15228','15229','15232','15233','15234','15235','15236','15237','15238',
+                '15239','15241','15243','15260','15290','15142','15075','15076','16055','15143',
+                '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
+                '15122','15089','15090','15148']
+'''
+zipcode_list = ['15222', '15232' ]
+category_list = ['American', 'Asian']
 
 
 def request(host, path, api_key, url_params=None):
@@ -130,11 +130,11 @@ def addResultsToList(businesses, location, category):
            value = i.get('location')
     
            if value.get('zip_code') == '':
-               businessZip = int(location)
+               businessZip = location
            else:
-               businessZip = int(value.get('zip_code')) 
+               businessZip = value.get('zip_code')
     
-           if (businessZip == int(location)):
+           if (int(businessZip) == int(location)):
               result = [businessZip, category, i.get('name'), i.get('rating'), i.get('review_count') ]
               result_list.append(result)
            
@@ -144,7 +144,9 @@ def resultsToDataFrame():
     col_names = ['zipcode', 'category', 'name', 'rating', 'review']
     df = pd.DataFrame(result_list, columns = col_names)
     df.head()
-        
+    
+    df.to_excel('AllYelpData.xlsx')
+    print('AllYelpData.xlsx updated')
     return df
     
     
@@ -155,11 +157,13 @@ def getSummaryData(df):
     for zipcode in zipcode_list:
         
         #summary across all restaurant categories in a zip
+
+        df['zipcode'] = (df['zipcode']).astype(int)
         df_filteredAll = df[(df.category != 'Bar') & (df.category != 'Grocery') & (df.zipcode == int(zipcode))]
         count = df_filteredAll['rating'].count()
         ratingAverage = df_filteredAll['rating'].mean()
         reviewCountAverage = df_filteredAll['review'].mean()
-        summaryResult = [zipcode, 'All Restaurants', count, ratingAverage, reviewCountAverage]
+        summaryResult = [str(zipcode), 'All Restaurants', count, ratingAverage, reviewCountAverage]
         summaryResultList.append(summaryResult)
         
         #summary for each category within a zipcode
@@ -168,17 +172,23 @@ def getSummaryData(df):
             count = df_filteredCategories['rating'].count()
             ratingAverage = df_filteredCategories['rating'].mean()
             reviewCountAverage = df_filteredCategories['review'].mean()
-            summaryResult = [zipcode, category, count, ratingAverage, reviewCountAverage]
+            summaryResult = [str(zipcode), category, count, ratingAverage, reviewCountAverage]
             summaryResultList.append(summaryResult)
             
     
     col_names = ['zipcode', 'category', 'count', 'average_rating', 'average_review_count']
     df_summary = pd.DataFrame(summaryResultList, columns = col_names)
- #   df_summary = df_summary.set_index('zipcode')
-  #  df_summary = df_summary['zipcode'].apply(str)
-    print(df_summary)
+ #  df_summary = df_summary.set_index('zipcode')
+ 
+    df_summary.to_excel('YelpSummaryData.xlsx')
+    print('YelpSummaryData.xlsx updated')
     
-    return df_summary
+    df_summaryTop = df_summary[df_summary.category == 'All Restaurants'] # returns 1 row for zipcode for all records cumulative
+    df_summaryTop = df_summaryTop.set_index('zipcode')
+    df_summaryTop.to_excel('YelpSummaryTop.xlsx')
+    print('YelpSummaryTop.xlsx updated')
+    
+    return df_summaryTop
  
 
 
@@ -187,9 +197,8 @@ def calculateRating(df, df_summary):
     ratings = []
     #determine variety of restuarant types
     for zipcode in zipcode_list:
-        df_filtered = df[df.zipcode == int(zipcode)]
+        df_filtered = df[df.zipcode == zipcode]
         counts = df_filtered['category'].value_counts().to_dict()
-        
         
         highestPercent = 0; variety = 0;
         for category, count in counts.items():
@@ -201,13 +210,13 @@ def calculateRating(df, df_summary):
                     
             variety = 5 - ((highestPercent - 0.25) * 5)
         
-        df_summaryFiltered = df_summary[(df_summary.zipcode == int(zipcode)) & ((df_summary.category == 'All Restaurants'))]
+        df_summaryFiltered = df_summary[(df_summary.zipcode == zipcode) & ((df_summary.category == 'All Restaurants'))]
         quality = df_summaryFiltered['average_rating'].mean()
         
-        df_summaryBar = df_summary[(df_summary.zipcode == int(zipcode)) & ((df_summary.category == 'Bar'))]
+        df_summaryBar = df_summary[(df_summary.zipcode == zipcode) & ((df_summary.category == 'Bar'))]
         bar = df_summaryBar['average_rating'].mean() * df_summaryBar['count'].sum()
         
-        df_summaryGrocery = df_summary[(df_summary.zipcode == int(zipcode)) & ((df_summary.category == 'Grocery'))]
+        df_summaryGrocery = df_summary[(df_summary.zipcode == zipcode) & ((df_summary.category == 'Grocery'))]
         grocery = df_summaryGrocery['average_rating'].mean() * df_summaryGrocery['count'].sum()
         
         rating = [zipcode, variety, quality, bar, grocery]
@@ -216,7 +225,7 @@ def calculateRating(df, df_summary):
     col_names = ['zipcode', 'variety', 'quality', 'bar', 'grocery']
     df_ratings = pd.DataFrame(ratings, columns = col_names)
     
-    df_ratings.to_csv('YelpOverallRating.csv')
+    df_ratings.to_excel('YelpOverallRating.xlsx')
     return df_ratings
 
 
@@ -242,17 +251,26 @@ def getData():
             input_values = parser.parse_args()
             addResultsToList(query_api(input_values.term, input_values.location), zipcode, category)
     
-    print('Done!')
-    return resultsToDataFrame()
+    print('API Requests Complete')
+    df = resultsToDataFrame()
+    return getSummaryData(df)
         
+def getDatafromExcel():
+    
+    df_yelpSummaryTop = pd.read_excel('YelpSummaryTop.xlsx')
+    df_yelpSummaryTop = df_yelpSummaryTop.set_index('zipcode')
+    print('Retrieved Yelp Data from Excel')
+    return df_yelpSummaryTop
+    
 
 def main():
-   
+ 
+
     df = getData()
     df_summary = getSummaryData(df)
     calculateRating(df, df_summary)
-
-
+     
+    getDatafromExcel()
     
 if __name__ == '__main__':
     main()
