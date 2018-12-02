@@ -10,10 +10,11 @@ def getData():
     
     
     #DataFrames to use for aggregation
-    df_yelpSummaryTop = yd.getData()
+  
     df_craigslistSummary = craig.getData()
     df_zillowSummary = zillow.zillowData()
     df_arrests = arrests.arrestData()
+    df_yelpSummaryTop = yd.getData()
     
     # checking size of dataFRames to be combined
     print("zillow df size: ", df_zillowSummary.shape, "\n")

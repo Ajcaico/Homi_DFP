@@ -34,6 +34,7 @@ result_list = []
 
 category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
 
+'''
 zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
                 '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
                 '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
@@ -47,7 +48,9 @@ zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104',
                 '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
                 '15122','15089','15090','15148']
 
-#zipcode_list = ['15222', '15232' ]
+'''
+
+zipcode_list = ['15222', '15232', '15237']
 #category_list = ['American', 'Asian']
 
 
@@ -158,7 +161,6 @@ def getSummaryData(df):
     for zipcode in zipcode_list:
         
         #summary across all restaurant categories in a zip
-
        
         df_filteredAll = df[(df.category != 'Bar') & (df.category != 'Grocery') & (df.zipcode == int(zipcode))] 
         count = df_filteredAll['rating'].count()
@@ -209,18 +211,21 @@ def calculateRating(df, df_summary):
                 if (percent > highestPercent):
                     highestPercent = percent
                     
-            variety = 5 - ((highestPercent - 0.25) * 5)
+            restaurantVariety = 5 - ((highestPercent - 0.25) * 5)
         
         df_summaryFiltered = df_summary[(df_summary.zipcode == zipcode) & ((df_summary.category == 'All Restaurants'))]
-        quality = df_summaryFiltered['average_rating'].mean()
+        restuarantRating = df_summaryFiltered['average_rating'].mean()
+        restaurantCount = df_summaryFiltered['count'].sum()
         
         df_summaryBar = df_summary[(df_summary.zipcode == zipcode) & ((df_summary.category == 'Bar'))]
-        bar = df_summaryBar['average_rating'].mean() * df_summaryBar['count'].sum()
+        barRating = df_summaryBar['average_rating'].mean() * df_summaryBar['count'].sum()
+        barCount = df_summaryBar['count'].sum()
         
         df_summaryGrocery = df_summary[(df_summary.zipcode == zipcode) & ((df_summary.category == 'Grocery'))]
-        grocery = df_summaryGrocery['average_rating'].mean() * df_summaryGrocery['count'].sum()
+        groceryRating = df_summaryGrocery['average_rating'].mean() * df_summaryGrocery['count'].sum()
+        groceryCount = df_summaryGrocery['count'].sum()
         
-        rating = [zipcode, variety, quality, bar, grocery]
+        rating = [zipcode, restaurantCount, restaurantVariety, restuarantRating, barCount, barRating, groceryCount, groceryRating]
         ratings.append(rating)
        
     col_names = ['zipcode', 'variety', 'quality', 'bar', 'grocery']
@@ -264,12 +269,22 @@ def getDatafromExcel():
     return df_yelpSummaryTop
     
 
+
+def getMacroChart():
+    pass    
+
+    
+    
+def getMicroChart(zipcode):
+    pass
+    
+
 def main():
  
 
     df = getData()
-  #  df_summary = getSummaryData(df)
- #   calculateRating(df, df_summary)
+    #  df_summary = getSummaryData(df)
+    #   calculateRating(df, df_summary)
      
     getDatafromExcel()
     
