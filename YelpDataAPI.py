@@ -13,11 +13,14 @@ from urllib.parse import quote
 from urllib.parse import urlencode
 import numpy as np
 import pandas as pd
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 
-#API_KEY= 'ag6RO1gG16UhJzSO-88XdFrpzaNgOpUwaxOkkXco4QvyOXyAdkyih7yGiq5iIGCbZ6rsSPJedkakFpeX0rZGeUfAr7zuWsXkwT6XCZGYSKi2ntPRsJkV00anQCjmW3Yx' 
 
-API_KEY = 'Zuso4ntCFv_QaB4i4a6K4j0R0meRcdJ6Lum873qy36Y6gN2diK9iCLlnqFX-GYtWH5fSN-I8NUFYhTyTcx8PhamgxYkCSD4MkmJ4lzTasDn99cWZjV9f9bgLFHD0W3Yx'
+API_KEY= 'ag6RO1gG16UhJzSO-88XdFrpzaNgOpUwaxOkkXco4QvyOXyAdkyih7yGiq5iIGCbZ6rsSPJedkakFpeX0rZGeUfAr7zuWsXkwT6XCZGYSKi2ntPRsJkV00anQCjmW3Yx' 
+
+#API_KEY = 'Zuso4ntCFv_QaB4i4a6K4j0R0meRcdJ6Lum873qy36Y6gN2diK9iCLlnqFX-GYtWH5fSN-I8NUFYhTyTcx8PhamgxYkCSD4MkmJ4lzTasDn99cWZjV9f9bgLFHD0W3Yx'
 
 
 # API constants, you shouldn't have to change these.
@@ -26,7 +29,7 @@ SEARCH_PATH = '/v3/businesses/search'
 BUSINESS_PATH = '/v3/businesses/'  # Business ID will come after slash.
 
 # Defaults for our simple example.
-SEARCH_LIMIT = 35
+SEARCH_LIMIT = 50
 
 zip_summary = {}
 result_list = []
@@ -34,7 +37,7 @@ result_list = []
 
 category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
 
-'''
+
 zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
                 '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
                 '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
@@ -48,44 +51,57 @@ zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104',
                 '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
                 '15122','15089','15090','15148']
 
-'''
 
-zipcode_list = ['15222', '15232', '15237']
+
+#zipcode_list = ['15122', '15221', '15235', '15232', '15237']
 #category_list = ['American', 'Asian']
 
 
+def getData():
+    
+    print('Starting Yelp API requests')
+    totalRequests = len(zipcode_list) * len(category_list)
+    print(str(totalRequests) + ' API requests will be made')
+    
+    count = 0
+    for zipcode in zipcode_list:
+        for category in category_list:
+            count += 1
+            print('Making request number: ' + str(count))
+            searchZip = str(zipcode)    
+            parser = argparse.ArgumentParser()
+            parser.add_argument('-q', '--term', dest='term', default=category,
+                            type=str, help='Search term (default: %(default)s)')
+            parser.add_argument('-l', '--location', dest='location',
+                            default=searchZip, type=str,
+                            help='Search location (default: %(default)s)')
+            input_values = parser.parse_args()
+            addResultsToList(query_api(input_values.term, input_values.location), zipcode, category)
+    
+    print('API Requests Complete')
+    df = resultsToDataFrame()
+    summaryDict = getSummaryData(df)
+    df_summaryTop = summaryDict['topSummary']
+    df_summary = summaryDict['summary']
+    print( df_summary.head())
+    print(df_summaryTop.head())
+    calculateRating(df, df_summary)
+    
+    return df_summaryTop
+
 def request(host, path, api_key, url_params=None):
 
-    """Given your API_KEY, send a GET request to the API.
-    Args:
-        host (str): The domain host of the API.
-        path (str): The path of the API after the domain.
-        API_KEY (str): Your API Key.
-        url_params (dict): An optional set of query parameters in the request.
-    Returns:
-        dict: The JSON response from the request.
-    Raises:
-        HTTPError: An error occurs from the HTTP request.
-    """
     url_params = url_params or {}
     url = '{0}{1}'.format(host, quote(path.encode('utf8')))
     headers = {
         'Authorization': 'Bearer %s' % api_key,
     }
 
-   # print(u'Querying {0} ...'.format(url))
     response = requests.request('GET', url, headers=headers, params=url_params)
     return response.json()
 
 def search(api_key, term, location):
 
-    """Query the Search API by a search term and location.
-    Args:
-        term (str): The search term passed to the API.
-        location (str): The search location passed to the API.
-    Returns:
-        dict: The JSON response from the request.
-    """
     url_params = {
         'term': term.replace(' ', '+'),
         'location': location.replace(' ', '+'),
@@ -96,22 +112,12 @@ def search(api_key, term, location):
 
 def get_business(api_key, business_id):
 
-    """Query the Business API by a business ID.
-    Args:
-        business_id (str): The ID of the business to query.
-    Returns:
-        dict: The JSON response from the request.
-    """
     business_path = BUSINESS_PATH + business_id
     return request(API_HOST, business_path, api_key)
 
 def query_api(term, location):
 
-    """Queries the API by the input values from the user.
-    Args:
-        term (str): The search term to query.
-        location (str): The location of the business to query.
-    """
+
     response = search(API_KEY, term, location)
     businesses = response.get('businesses')
 
@@ -155,7 +161,7 @@ def getSummaryData(df):
   
     summaryResultList = []   
     df['zipcode'] = (df['zipcode']).astype(int)
-    
+    df['rating_reviews'] = df['rating']*df['review'] 
     
     
     for zipcode in zipcode_list:
@@ -164,7 +170,7 @@ def getSummaryData(df):
        
         df_filteredAll = df[(df.category != 'Bar') & (df.category != 'Grocery') & (df.zipcode == int(zipcode))] 
         count = df_filteredAll['rating'].count()
-        ratingAverage = df_filteredAll['rating'].mean()
+        ratingAverage = df_filteredAll['rating_reviews'].sum() / df_filteredAll['review'].sum() 
         reviewCountAverage = df_filteredAll['review'].mean()
         summaryResult = [str(zipcode), 'All Restaurants', count, ratingAverage, reviewCountAverage]
         summaryResultList.append(summaryResult)
@@ -191,7 +197,7 @@ def getSummaryData(df):
     df_summaryTop.to_excel('YelpSummaryTop.xlsx')
     print('YelpSummaryTop.xlsx updated')
     
-    return df_summaryTop
+    return {'topSummary': df_summaryTop, 'summary': df_summary}
  
 
 
@@ -200,10 +206,10 @@ def calculateRating(df, df_summary):
     ratings = []
     #determine variety of restuarant types
     for zipcode in zipcode_list:
-        df_filtered = df[df.zipcode == zipcode]
+        df_filtered = df[df.zipcode == int(zipcode)]
         counts = df_filtered['category'].value_counts().to_dict()
         
-        highestPercent = 0; variety = 0;
+        highestPercent = 0; restaurantVariety = 0;
         for category, count in counts.items():
             if (category != 'Bar' and category != 'Grocery'):
                 totalCount = df_filtered[(df.category != 'Bar') & (df.category != 'Grocery')]['category'].count()
@@ -216,77 +222,115 @@ def calculateRating(df, df_summary):
         df_summaryFiltered = df_summary[(df_summary.zipcode == zipcode) & ((df_summary.category == 'All Restaurants'))]
         restuarantRating = df_summaryFiltered['average_rating'].mean()
         restaurantCount = df_summaryFiltered['count'].sum()
+        restaurantScore = (restaurantVariety + restuarantRating) / 2
         
         df_summaryBar = df_summary[(df_summary.zipcode == zipcode) & ((df_summary.category == 'Bar'))]
-        barRating = df_summaryBar['average_rating'].mean() * df_summaryBar['count'].sum()
+        barScore = df_summaryBar['average_rating'].mean() * 0.5 + df_summaryBar['count'].sum() / 10
         barCount = df_summaryBar['count'].sum()
+        barRating = df_summaryBar['average_rating'].mean()
         
         df_summaryGrocery = df_summary[(df_summary.zipcode == zipcode) & ((df_summary.category == 'Grocery'))]
-        groceryRating = df_summaryGrocery['average_rating'].mean() * df_summaryGrocery['count'].sum()
+        groceryScore = df_summaryGrocery['average_rating'].mean() *0.5 + df_summaryGrocery['count'].sum() / 5
         groceryCount = df_summaryGrocery['count'].sum()
+        groceryRating = df_summaryGrocery['average_rating'].mean()
         
-        rating = [zipcode, restaurantCount, restaurantVariety, restuarantRating, barCount, barRating, groceryCount, groceryRating]
+        rating = [zipcode, restaurantCount, restaurantVariety, restuarantRating, restaurantScore, barCount, barRating, barScore, groceryCount, groceryRating, groceryScore]
         ratings.append(rating)
        
-    col_names = ['zipcode', 'variety', 'quality', 'bar', 'grocery']
+    col_names = ['zipcode', 'restaurantCount', 'restaurantVariety', 'restuarantRating', 'restaurantScore', 'barCount', 'barRating', 'barScore', 'groceryCount', 'groceryRating', 'groceryScore']
     df_ratings = pd.DataFrame(ratings, columns = col_names)
     
+    print('YelpOverallRating.xlsx updated')
     df_ratings.to_excel('YelpOverallRating.xlsx')
     return df_ratings
 
-
-
-def getData():
-    
-    print('Starting Yelp API requests')
-    totalRequests = len(zipcode_list) * len(category_list)
-    print(str(totalRequests) + ' API requests will be made')
-    
-    count = 0
-    for zipcode in zipcode_list:
-        for category in category_list:
-            count += 1
-            print('Making request number: ' + str(count))
-            searchZip = str(zipcode)    
-            parser = argparse.ArgumentParser()
-            parser.add_argument('-q', '--term', dest='term', default=category,
-                            type=str, help='Search term (default: %(default)s)')
-            parser.add_argument('-l', '--location', dest='location',
-                            default=searchZip, type=str,
-                            help='Search location (default: %(default)s)')
-            input_values = parser.parse_args()
-            addResultsToList(query_api(input_values.term, input_values.location), zipcode, category)
-    
-    print('API Requests Complete')
-    df = resultsToDataFrame()
-    return getSummaryData(df)
         
 def getDatafromExcel():
     
     df_yelpSummaryTop = pd.read_excel('YelpSummaryTop.xlsx')
     df_yelpSummaryTop = df_yelpSummaryTop.set_index('zipcode')
+    
+    df_allYelpData = pd.read_excel('AllYelpData.xlsx')
+    df_allYelpData = df_allYelpData.set_index('zipcode')
+    
+    df_yelpSummary = pd.read_excel('YelpSummaryData.xlsx')
+  #  df_yelpSummary = df_yelpSummary.set_index('zipcode')
+    
+    df_yelpOverallScore = pd.read_excel('YelpOverallRating.xlsx')
+    df_yelpOverallScore = df_yelpOverallScore.set_index('zipcode')
+    
     print('Retrieved Yelp Data from Excel')
-    return df_yelpSummaryTop
+    return {'allData' : df_allYelpData, 'summaryData': df_yelpSummary, 'topSummaryData' : df_yelpSummaryTop, 'overallScore' : df_yelpOverallScore}
     
 
 
 def getMacroChart():
-    pass    
-
+    
+    dataDict = getDatafromExcel()
+    df = dataDict['overallScore']
+    df = df.dropna()
+    df = df[(df.restaurantCount !=0) & (df.barCount != 0) & (df.groceryCount !=0)]
+    df_restaurantCount = df['restaurantCount']
+  #  df_restaurantCount = df_restaurantCount[(df_restaurantCount.restaurantCount != 0)]
+ #   df_restaurantCount = df_restaurantCount.dropna()
+    print(df_restaurantCount)
+    
+    num_bins = 16
+    plt.title("Distribution of Number of Restaurants by Zip")
+    plt.xlabel("Number of Restaurants")
+    plt.ylabel("Frequency")
+    plt.hist(df_restaurantCount, num_bins) 
+    plt.show()
+    
+    df_barCount = df['barCount']
+#    df_barCount = df_barCount[df_barCount.barCount != 0]
+ #   df_barCount = df_barCount.dropna()
+    plt.title("Distribution of Number of Bars by Zip")
+    plt.xlabel("Number of Bars")
+    plt.ylabel("Frequency")
+    plt.hist(df_barCount, num_bins) 
+    plt.show()
+    
+    df_groceryCount = df['groceryCount']
+ #   df_groceryCount = df_groceryCount.dropna()
+    plt.title("Distribution of Number of Grocery by Zip")
+    plt.xlabel("Number of Grocery Stores")
+    plt.ylabel("Frequency")
+    plt.hist(df_groceryCount, num_bins) 
+    plt.show()
+    
     
     
 def getMicroChart(zipcode):
-    pass
+    
+    dataDict = getDatafromExcel()
+    df = dataDict['summaryData']
+    df_count = df[(df.zipcode == int(zipcode)) & (df.category != 'All Restaurants')]
+    df_count = df_count[['category', 'count', 'average_rating']]
+    df_count=df_count.set_index('category')
+    
+    
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax2 = ax.twinx()
+    width = 0.3
+    
+    df_count['count'].plot(kind='bar', color = 'red', ax=ax, width=width, position = 1, align = 'center')
+    df_count['average_rating'].plot(kind='bar', color = 'blue', ax=ax2, width = width, position = 0, align = 'center')
+    
+    ax.set_ylabel('Count (Red)')
+    ax2.set_ylabel('Average Rating (Blue)')
+    ax.set_xlabel('Category')
+    
+    plt.show()
     
 
 def main():
  
+ #   getData()
+    getMacroChart()
+    getMicroChart('15222')
 
-    df = getData()
-    #  df_summary = getSummaryData(df)
-    #   calculateRating(df, df_summary)
-     
-    getDatafromExcel()
     
 if __name__ == '__main__':
     main()
