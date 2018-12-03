@@ -38,11 +38,12 @@ zipCodeList = ['15101','15003','15005','15006','15007','15102','15014','15104','
 # index 2: rental price / square foot
 # index 3: yet to be filled
 for z in zipCodeList:
-    zillowPriceDict[str(z)] = {'medSalePPSF': np.nan,'medSale1Bed': np.nan,'medSale2Bed':np.nan,'medSale3Bed':np.nan,
-                        'medSale4Bed':np.nan,'medSale5pBed': np.nan}
+    zillowSalePriceDict[str(z)] = {'medSalePPSF': np.nan,'medSalePerBed': np.nan,'medSale2Bed':np.nan}
 #                        'medRentPPSF': -1,'medRent1Bed': -1,'medRent2Bed': -1,'medRent3Bed': -1,
 #                        'medRent4Bed': -1,'medRent5pBed': -1}
-
+    
+for z in zipCodeList:
+    zipHolderDict[str(z)] = {'TotalmedPricePerBed': np.nan,'medSale2Bed':np.nan}
 
 #check creation date of file, system time function
 # Reference stackOverflow
@@ -70,7 +71,7 @@ yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
 lastLoaded = creation_date('Zip\\Zip_MedianValuePerSqft_AllHomes.csv')
 
 # extract zip from zillow to folder once a day
-if (yesterday > lastLoaded):
+if (yesterday < lastLoaded):
     print("Zillow data file last update: ",lastLoaded)
     print("More than 24 hours since last update")
     print("Updating file...")
@@ -86,9 +87,9 @@ if (yesterday > lastLoaded):
 with open('Zip\\Zip_MedianValuePerSqft_AllHomes.csv') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader:
-        if row['State'] == 'PA':
-            if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medSalePPSF'] = row['2018-09']
+        if (row['State'] == 'PA') and (row['RegionName'] in zillowPriceDict) and (row['2018-09'] != ""):
+            zillowPriceDict[row['RegionName']]['medSalePPSF'] = float(row['2018-09'])
+                
        
 # med sale of 1 bed   
 with open('Zip\\Zip_Zhvi_1bedroom.csv') as csv_file:
@@ -96,7 +97,7 @@ with open('Zip\\Zip_Zhvi_1bedroom.csv') as csv_file:
     for row in csv_reader: 
         if row['State'] == 'PA':
             if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medSale1Bed'] = row['2018-09']
+                zillowPriceDict[row['RegionName']]['medSale1Bed'] = float(row['2018-09'])
                 
 # med sale of 2 bed
 with open('Zip\\Zip_Zhvi_2bedroom.csv') as csv_file:
@@ -104,7 +105,7 @@ with open('Zip\\Zip_Zhvi_2bedroom.csv') as csv_file:
     for row in csv_reader: 
         if row['State'] == 'PA':
             if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medSale2Bed'] = row['2018-09']
+                zillowPriceDict[row['RegionName']]['medSale2Bed'] = float(row['2018-09'])/2
 
 # med sale of 3 bed
 with open('Zip\\Zip_Zhvi_3bedroom.csv') as csv_file:
@@ -112,7 +113,7 @@ with open('Zip\\Zip_Zhvi_3bedroom.csv') as csv_file:
     for row in csv_reader: 
         if row['State'] == 'PA':
             if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medSale3Bed'] = row['2018-09']
+                zillowPriceDict[row['RegionName']]['medSale3Bed'] = float(row['2018-09'])/3
                 
 # med sale of 4 bed
 with open('Zip\\Zip_Zhvi_4bedroom.csv') as csv_file:
@@ -120,14 +121,14 @@ with open('Zip\\Zip_Zhvi_4bedroom.csv') as csv_file:
     for row in csv_reader: 
         if row['State'] == 'PA':
             if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medSale4Bed'] = row['2018-09']             
+                zillowPriceDict[row['RegionName']]['medSale4Bed'] = float(row['2018-09'])/4          
 # med sale of 5plus beds 
 with open('Zip\\Zip_Zhvi_5BedroomOrMore.csv') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader: 
         if row['State'] == 'PA':
             if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medSale5pBed'] = row['2018-09']
+                zillowPriceDict[row['RegionName']]['medSale5pBed'] = float(row['2018-09'])/5
                 
             
 #getting Rental prices and saving them to dictionary
