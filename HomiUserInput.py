@@ -8,10 +8,27 @@ import YelpDataAPI as yd
 import CraigslistCode as cc
 import GetZipcodeRentalPricePlot as rp
 import ZillowHousingDataByZip as zd
+import ArrestData as ar
 
 firstZip = 0
 secondZip = 0
 thirdZip = 0
+
+df_craigslistSummary = cc.getData()
+df_zillowSummary = zd.zillowData()
+df_arrests = ar.arrestData()
+df_yelpSummaryTop = df_yelp = yd.getOverallRating()
+
+# checking size of dataFRames to be combined
+print("zillow df size: ", df_zillowSummary.shape, "\n")
+print("craigslist df size: ", df_craigslistSummary.shape, "\n")
+print("Yelp df size: ", df_yelpSummaryTop.shape, "\n")
+print("Arrests df size: ", df_arrests.shape, "\n")
+
+result = pd.concat([df_zillowSummary, df_craigslistSummary, df_arrests], axis=1, join='outer')
+print(result)
+# result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop, df_arrests], axis=1, join='outer')
+#print(result)
 
 
 
