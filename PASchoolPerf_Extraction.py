@@ -9,6 +9,9 @@
 #NotebookApp.iopub_data_rate_limit=10000000.0 (bytes/sec)
 #NotebookApp.rate_limit_window=10.0 (secs)
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 schools = {}
 #columns = []
@@ -27,6 +30,7 @@ AlleghenyZipcodes = {'15101','15003','15005','15006','15007','15102','15014','15
 SchoolComplete = []
 AlleghenySchools = {}
 AlleghenySchoolZipAgg = {}
+AlleghenySchoolAvgsDict = {}
 
 def ReadFiles_M():
     fin = open("SPP.APD.2016.2017.txt", "rt", encoding = 'utf-8')
@@ -366,8 +370,173 @@ def ZipAgg_M():
                 'Economically_Disadvantage': Economically_Disadvantage, 'Num_AP': Num_AP,
                 'Num_Gifted': Num_Gifted, 'Avg_Enroll': Avg_Enroll, 'School_Count': School_Count,
                 'BlendedScore': BlendedScore} 
+            
+####################################################################################            
+    AlleghenySchoolZipAgg_DF = pd.DataFrame(AlleghenySchoolZipAgg).T            
 
-        
+def AlleghenySchoolAvgs_M():
+    
+    totalAttend = 0
+    totalAttend_C = 0
+    totalBlend = 0
+    totalBlend_C = 0
+    totalEconDis = 0
+    totalEconDis_C = 0
+    totalLit = 0
+    totalLit_C = 0
+    totalMath = 0
+    totalMath_C = 0
+    totalScience = 0
+    totalScience_C = 0
+    totalCalc = 0
+    totalCalc_C = 0
+    
+    
+    for key,value in AlleghenySchoolZipAgg.items():
+        try:
+            totalAttend += value['AttendanceRate']
+            totalAttend_C += 1
+        except:
+            None
+        try:
+            totalBlend += value['BlendedScore']
+            totalBlend_C += 1
+        except:
+            None   
+        try:
+            totalEconDis += value['Economically_Disadvantage']
+            totalEconDis_C += 1
+        except:
+            None
+        try:
+            totalLit += value['Lit_PSSA']
+            totalLit_C += 1
+        except:
+            None              
+        try:
+            totalMath += value['Math_PSSA']
+            totalMath_C += 1
+        except:
+            None
+        try:
+            totalScience += value['Science_PSSA']
+            totalScience_C += 1
+        except:
+            None
+        try:
+            totalCalc += value['Calc_Score']
+            totalCalc_C += 1
+        except:
+            None            
+            
+            
+    totalAttend /= totalAttend_C
+    totalBlend /= totalBlend_C      
+    totalEconDis /= totalEconDis_C
+    totalLit /= totalLit_C                
+    totalMath /= totalMath_C
+    totalScience /= totalScience_C
+    AlleghenySchoolAvgsDict["totalAttend"] = totalAttend
+    AlleghenySchoolAvgsDict["totalBlend"] = totalBlend
+    AlleghenySchoolAvgsDict["totalEconDis"] = totalEconDis
+    AlleghenySchoolAvgsDict["totalLit"] = totalLit
+    AlleghenySchoolAvgsDict["totalMath"] = totalMath
+    AlleghenySchoolAvgsDict["totalScience"] = totalScience
+    AlleghenySchoolAvgsDict["totalCalc"] = totalCalc
+    
+    MissingZips = {'15045', '15148', '15086', '15035', '15006', '15046', '15051',
+                   '15028', '15049', '16059', '15088', '15064', '15112', '15020',
+                   '15030', '15082', '15290', '15047', '15076', '15225', '15007',
+                   '15104', '15026', '15018', '15142', '15031', '15034', '15075',
+                   '15260', '15223'}
+    
+    for zip1 in MissingZips:
+        AlleghenySchoolZipAgg[zip1] = {'AttendanceRate': totalAttend, 'Calc_Score': totalCalc,
+            'Grad_Rate': 0, 'Lit_PSSA': totalLit, 'Final_Academic_Score': 0,
+            'Math_PSSA': totalMath, 'Science_PSSA': totalScience, 'Dropout_Rate': 0, 
+            'Economically_Disadvantage': totalEconDis, 'Num_AP': 0,
+            'Num_Gifted': 0, 'Avg_Enroll': 0, 'School_Count': 0,
+            'BlendedScore': totalBlend}
+
+
+def printMacroChart_M():
+
+    blendScore = []
+    for key,value in AlleghenySchoolZipAgg.items():
+        blendScore.append(value['BlendedScore'])
+    blendScore_np = np.array(blendScore)
+    blendScore = pd.DataFrame(blendScore)
+    #blendScore.plot()
+    blendScore.plot.hist(bins = 5, rwidth = 0.9, label=None)
+    plt.title('Distribution of School Scores by Zip Code')
+    plt.xlabel('Blended Score')
+    plt.axvline(blendScore_np.mean(), color='navy', linestyle='dashed', linewidth=1)
+    plt.show()
+    
+    
+#not working atm.  Want to create several column charts with the zipcode's avg
+#and the avg for all of allegheny county    
+def printZipCodeColumn_M(zipcode):
+    zip = zipcode
+    df = ReturnAggregate()
+    
+
+    avg = pd.Series(AlleghenySchoolAvgsDict)
+    #print(avg)
+    localAttend = df.loc[str(zip),'AttendanceRate']
+    localBlend = df.loc[str(zip),'BlendedScore']
+    localEcon = df.loc[str(zip),'Economically_Disadvantage']
+    localLit = df.loc[str(zip),'Lit_PSSA']
+    localMath = df.loc[str(zip),'Math_PSSA']    
+    localScience = df.loc[str(zip),'Science_PSSA']   
+    local = pd.Series([localAttend,localBlend, localEcon, localLit, localMath, localScience],
+                      index = ['AttendanceRate','BlendedScore','Economically_Disadvantage',
+                               'Lit_PSSA', 'Math_PSSA', 'Science_PSSA'])
+    #print(local)     
+     
+    #comparing Zipcode attendance rate vs. Average attendance rate
+    #localAttend = AlleghenySchoolZipAgg[zip]["totalAttend"]
+    AlleghenySchoolAvgs_NpArray = np.array(list(AlleghenySchoolAvgsDict.items()))
+    #print(AlleghenySchoolAvgs_NpArray)
+
+    avgAttend = AlleghenySchoolAvgs_NpArray[0][1]
+    avgBlend = AlleghenySchoolAvgs_NpArray[1][1]
+    avgEconDis = AlleghenySchoolAvgs_NpArray[2][1]
+    avgLit = AlleghenySchoolAvgs_NpArray[3][1]
+    avgMath = AlleghenySchoolAvgs_NpArray[4][1]
+    avgScience = AlleghenySchoolAvgs_NpArray[5][1]   
+    
+    listAttend = ['Attendance', float(avgAttend), float(localAttend)]
+    listBlend = ['Blended', float(avgBlend), float(localBlend)]
+    listEcon = ['Econ. Disadvatange', float(avgEconDis)*100, float(localEcon)*100]
+    listLit = ['Lit Scores', float(avgLit), float(localLit)]
+    listMath = ['Math Scores', float(avgMath), float(localMath)]
+    listScience = ['Science Scores', float(avgScience), float(localScience)]
+    
+    listOfMetrics = [listBlend, listAttend, listEcon, listLit, listMath, listScience]
+    
+    col_names = ['label', 'county score', 'local zip score']
+    df = pd.DataFrame(listOfMetrics, columns = col_names)
+    df = df.set_index('label')
+    #print(df)
+    
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_ylabel("Scores")
+    ax2 = ax.twinx()
+    width = 0.3
+    
+    df['county score'].plot(kind='bar', color='skyblue', ax=ax,width=width, position=1, align='center')
+    df['local zip score'].plot(kind='bar', color='blue', ax=ax2,width=width, position=0, align='center')
+    
+    local_patch = mpatches.Patch(color='skyblue', label='Local Score')
+    county_patch = mpatches.Patch(color='blue', label='County Score')
+    plt.legend(handles=[local_patch, county_patch])  
+    
+    plt.title("Allegheny County vs. Local School Metrics")
+    plt.show()
+     
+    
 def printToExcel_M():
     df = pd.DataFrame(AlleghenySchoolZipAgg).T
     df.to_excel('AggregateData.xlsx')
@@ -407,13 +576,21 @@ def testPrintStatements():
 def ReturnAggregate():
     return pd.DataFrame(AlleghenySchoolZipAgg).T
 
+def ReturnAggregate_Rebase():
+    df = pd.DataFrame(AlleghenySchoolZipAgg).T
+    maxAttend = df['BlendedScore'].max()
+    maxFactor = maxAttend/5
+    df['BlendedScore_rebase'] = df['BlendedScore'] /maxFactor
+    return df
+
 #Main Method
 def SchoolMainMethod_M():
     ReadFiles_M()
     NarrowAllegheny_M()
     SchoolListList_M()
     ZipAgg_M()
-    printToExcel_M()
+    AlleghenySchoolAvgs_M()
+#    printToExcel_M()
 
 
 # In[ ]:
@@ -447,6 +624,10 @@ def SchoolMainMethod_M():
 
 
 SchoolMainMethod_M()
+ReturnAggregate_Rebase()
+if (__name__ == '__main__'):
+    printMacroChart_M()
+    printZipCodeColumn_M(15237)
 
 
 # In[ ]:
