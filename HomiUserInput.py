@@ -9,27 +9,32 @@ import CraigslistCode as cc
 import GetZipcodeRentalPricePlot as rp
 import ZillowHousingDataByZip as zd
 import ArrestData as ar
-#import PASchoolPerf_Extraction as ed
+import PASchoolPerf_Extraction as ed
 import pandas as pd
 
 firstZip = 0
 secondZip = 0
 thirdZip = 0
 
-df_education = ed.getData().ReturnAggregate_Rebase()
-df_craigslistSummary = cc.getData()
+
 df_zillowSummary = zd.zillowData()
+df_craigslistSummary = cc.getData()
 df_arrests = ar.arrestData()
+df_education = ed.ReturnAggregate()
+# df_education = ed.getData().ReturnAggregate_Rebase()
 df_yelp = yd.getOverallRating()
 
-# checking size of dataFRames to be combined
+# converting index from ints to string
+df_yelp.index = df_yelp.index.astype(str)
+
+# checking size of dataFrames to be combined
 print("zillow df size: ", df_zillowSummary.shape, "\n")
 print("craigslist df size: ", df_craigslistSummary.shape, "\n")
-print("Yelp df size: ", df_yelp.shape, "\n")
 print("Arrests df size: ", df_arrests.shape, "\n")
+print("Yelp df size: ", df_yelp.shape, "\n")
+print("Education df size: ", df_education.shape, "\n")
 
-result = pd.concat([df_zillowSummary, df_craigslistSummary, df_arrests], axis=1, join='outer')
-print(result)
+result = pd.concat([df_zillowSummary, df_craigslistSummary, df_arrests, df_yelp, df_education], axis=1, join='outer')
 result.to_excel('Result.xlsx')
 #result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop, df_arrests], axis=1, join='outer')
 ##print(result)
