@@ -17,8 +17,13 @@ import os
 import platform
 import datetime
 import numpy as np
+import plotly
+
+plotly.
+
 
 zillowPriceDict = {}
+pricePerBedDict = {}
 zipCodeList = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
                  '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
                  '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
@@ -33,17 +38,12 @@ zipCodeList = ['15101','15003','15005','15006','15007','15102','15014','15104','
                  '15122','15089','15090','15148']
 
 
-# creating dictionary with a 3 index list for storing prices
-# index 1: housing price / square foot
-# index 2: rental price / square foot
-# index 3: yet to be filled
+# creating dictionary for storing pricing data found in files
 for z in zipCodeList:
-    zillowSalePriceDict[str(z)] = {'medSalePPSF': np.nan,'medSalePerBed': np.nan,'medSale2Bed':np.nan}
-#                        'medRentPPSF': -1,'medRent1Bed': -1,'medRent2Bed': -1,'medRent3Bed': -1,
-#                        'medRent4Bed': -1,'medRent5pBed': -1}
-    
-for z in zipCodeList:
-    zipHolderDict[str(z)] = {'TotalmedPricePerBed': np.nan,'medSale2Bed':np.nan}
+    zillowPriceDict[str(z)] = {'medSalePPSF': np.nan,'medSalePerBed': np.nan}
+    # create dictionary for calculating average price per bedroom of all house sales in each zipcode
+    pricePerBedDict[str(z)] = {'SumOfSales': 0,'NumOfBedroomsSold': 0}
+
 
 #check creation date of file, system time function
 # Reference stackOverflow
@@ -71,7 +71,7 @@ yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
 lastLoaded = creation_date('Zip\\Zip_MedianValuePerSqft_AllHomes.csv')
 
 # extract zip from zillow to folder once a day
-if (yesterday < lastLoaded):
+if (yesterday > lastLoaded):
     print("Zillow data file last update: ",lastLoaded)
     print("More than 24 hours since last update")
     print("Updating file...")
@@ -89,96 +89,51 @@ with open('Zip\\Zip_MedianValuePerSqft_AllHomes.csv') as csv_file:
     for row in csv_reader:
         if (row['State'] == 'PA') and (row['RegionName'] in zillowPriceDict) and (row['2018-09'] != ""):
             zillowPriceDict[row['RegionName']]['medSalePPSF'] = float(row['2018-09'])
-                
-       
+            
 # med sale of 1 bed   
 with open('Zip\\Zip_Zhvi_1bedroom.csv') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader: 
-        if row['State'] == 'PA':
-            if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medSale1Bed'] = float(row['2018-09'])
+        if (row['State'] == 'PA') and (row['RegionName'] in zillowPriceDict) and (row['2018-09'] != ""):
+            pricePerBedDict[row['RegionName']]['SumOfSales'] += float(row['2018-09'])
+            pricePerBedDict[row['RegionName']]['NumOfBedroomsSold'] += 1
                 
 # med sale of 2 bed
 with open('Zip\\Zip_Zhvi_2bedroom.csv') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader: 
-        if row['State'] == 'PA':
-            if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medSale2Bed'] = float(row['2018-09'])/2
+        if (row['State'] == 'PA') and (row['RegionName'] in zillowPriceDict) and (row['2018-09'] != ""):
+            pricePerBedDict[row['RegionName']]['SumOfSales'] += float(row['2018-09'])
+            pricePerBedDict[row['RegionName']]['NumOfBedroomsSold'] += 2
 
 # med sale of 3 bed
 with open('Zip\\Zip_Zhvi_3bedroom.csv') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader: 
-        if row['State'] == 'PA':
-            if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medSale3Bed'] = float(row['2018-09'])/3
+        if (row['State'] == 'PA') and (row['RegionName'] in zillowPriceDict) and (row['2018-09'] != ""):
+            pricePerBedDict[row['RegionName']]['SumOfSales'] += float(row['2018-09'])
+            pricePerBedDict[row['RegionName']]['NumOfBedroomsSold'] += 3
                 
 # med sale of 4 bed
 with open('Zip\\Zip_Zhvi_4bedroom.csv') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader: 
-        if row['State'] == 'PA':
-            if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medSale4Bed'] = float(row['2018-09'])/4          
+        if (row['State'] == 'PA') and (row['RegionName'] in zillowPriceDict) and (row['2018-09'] != ""):
+            pricePerBedDict[row['RegionName']]['SumOfSales'] += float(row['2018-09'])
+            pricePerBedDict[row['RegionName']]['NumOfBedroomsSold'] += 4      
 # med sale of 5plus beds 
 with open('Zip\\Zip_Zhvi_5BedroomOrMore.csv') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader: 
-        if row['State'] == 'PA':
-            if row['RegionName'] in zillowPriceDict:
-                zillowPriceDict[row['RegionName']]['medSale5pBed'] = float(row['2018-09'])/5
+        if (row['State'] == 'PA') and (row['RegionName'] in zillowPriceDict) and (row['2018-09'] != ""):
+            pricePerBedDict[row['RegionName']]['SumOfSales'] += float(row['2018-09'])
+            pricePerBedDict[row['RegionName']]['NumOfBedroomsSold'] += 5
                 
             
-#getting Rental prices and saving them to dictionary
-# rent price per sqft
-#with open('Zip\\Zip_ZriPerSqft_AllHomes.csv') as csv_file:
-#    csv_reader = csv.DictReader(csv_file)
-#    for row in csv_reader: 
-#        if row['State'] == 'PA':
-#            if row['RegionName'] in zillowPriceDict:
-#                zillowPriceDict[row['RegionName']]['medRentPPSF'] = row['2018-09']
-#  ##              
-## med sale of 1 bed
-#with open('Zip\\Zip_MedianRentalPrice_1Bedroom.csv') as csv_file:
-#    csv_reader = csv.DictReader(csv_file)
-#    for row in csv_reader: 
-#        if row['State'] == 'PA':
-#            if row['RegionName'] in zillowPriceDict:
-#                zillowPriceDict[row['RegionName']]['medRent1Bed'] = row['2018-09']
-#
-## med sale of 2 bed
-#with open('Zip\\Zip_MedianRentalPrice_2Bedroom.csv') as csv_file:
-#    csv_reader = csv.DictReader(csv_file)
-#    for row in csv_reader: 
-#        if row['State'] == 'PA':
-#            if row['RegionName'] in zillowPriceDict:
-#                zillowPriceDict[row['RegionName']]['medRent2Bed'] = row['2018-09']
-#
-## med sale of 3 bed
-#with open('Zip\\Zip_MedianRentalPrice_3Bedroom.csv') as csv_file:
-#    csv_reader = csv.DictReader(csv_file)
-#    for row in csv_reader: 
-#        if row['State'] == 'PA':
-#            if row['RegionName'] in zillowPriceDict:
-#                zillowPriceDict[row['RegionName']]['medRent3Bed'] = row['2018-09']
-#
-## med sale of 4 bed
-#with open('Zip\\Zip_MedianRentalPrice_4Bedroom.csv') as csv_file:
-#    csv_reader = csv.DictReader(csv_file)
-#    for row in csv_reader: 
-#        if row['State'] == 'PA':
-#            if row['RegionName'] in zillowPriceDict:
-#                zillowPriceDict[row['RegionName']]['medRent4Bed'] = row['2018-09']
-#                
-## med sale of 5 plus beds
-#with open('Zip\\Zip_MedianRentalPrice_5BedroomOrMore.csv') as csv_file:
-#    csv_reader = csv.DictReader(csv_file)
-#    for row in csv_reader: 
-#        if row['State'] == 'PA':
-#            if row['RegionName'] in zillowPriceDict:
-#                zillowPriceDict[row['RegionName']]['medRent5pBed'] = row['2018-09']
+# append average price per room info to zillow price dictionary
+for key in zillowPriceDict:
+    if pricePerBedDict[key]['NumOfBedroomsSold'] != 0:
+        zillowPriceDict[key]['medSalePerBed'] = round(pricePerBedDict[key]['SumOfSales'] / pricePerBedDict[key]['NumOfBedroomsSold'], 2)
 
 #convert dictionary to dataframe
 df = pd.DataFrame(zillowPriceDict).T
@@ -190,9 +145,11 @@ def zillowData():
 def zillowDataDict():
     return zillowPriceDict
 
-if __name__ == '__main__':         
+if __name__ == '__main__':  
+    zillowPriceDict
     for i in zillowPriceDict:
         print(i,zillowPriceDict[i])
+    
 
     # write dictionary to csv
     df.to_excel('ZipCodeMedHousingPrice.xlsx')
