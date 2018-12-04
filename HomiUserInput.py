@@ -9,26 +9,30 @@ import CraigslistCode as cc
 import GetZipcodeRentalPricePlot as rp
 import ZillowHousingDataByZip as zd
 import ArrestData as ar
+#import PASchoolPerf_Extraction as ed
+import pandas as pd
 
 firstZip = 0
 secondZip = 0
 thirdZip = 0
 
+df_education = ed.getData().ReturnAggregate_Rebase()
 df_craigslistSummary = cc.getData()
 df_zillowSummary = zd.zillowData()
 df_arrests = ar.arrestData()
-df_yelpSummaryTop = df_yelp = yd.getOverallRating()
+df_yelp = yd.getOverallRating()
 
 # checking size of dataFRames to be combined
 print("zillow df size: ", df_zillowSummary.shape, "\n")
 print("craigslist df size: ", df_craigslistSummary.shape, "\n")
-print("Yelp df size: ", df_yelpSummaryTop.shape, "\n")
+print("Yelp df size: ", df_yelp.shape, "\n")
 print("Arrests df size: ", df_arrests.shape, "\n")
 
 result = pd.concat([df_zillowSummary, df_craigslistSummary, df_arrests], axis=1, join='outer')
 print(result)
-# result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop, df_arrests], axis=1, join='outer')
-#print(result)
+result.to_excel('Result.xlsx')
+#result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop, df_arrests], axis=1, join='outer')
+##print(result)
 
 
 
@@ -100,7 +104,10 @@ def getUserInput():
 
 def calculateOverallScore(inputDict):
     df_yelp = yd.getOverallRating()
-   
+    df_yelp['restaurantScore'] = df_yelp['restaurantScore'].fillna(value=0)
+    df_yelp['barScore'] = df_yelp['barScore'].fillna(value=0)
+    df_yelp['groceryScore'] = df_yelp['groceryScore'].fillna(value=0)
+    
 
     df_overall = df_yelp
     # result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop, df_arrests], axis=1, join='outer')
