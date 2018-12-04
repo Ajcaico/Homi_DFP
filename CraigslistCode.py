@@ -22,8 +22,8 @@ zipTitles = []
 zipNeighborhoods = []
 allDictionary = {}
 zipDictionary = {}
-zipcodes = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
-            '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
+zipcodes = ['15101','15003','15005','15007','15102','15014','15104','15015','15017',
+            '15018','15106','15024','15025','15026','15108','15028','15030','15046',
             '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
             '15047','15049','15120','15126','15051','15642','15056','16046','15057','15136',
             '15131','15132','15133','15135','15063','15146','15064','15668','15065','15068',
@@ -139,7 +139,8 @@ def getData():
                     nonNullSF = nonNullSF + 1
                     nonNullSFList.append(float(sf))   
                     
-        zipDictionary[zipcode] = {'NumApartments': aptCount,
+        zipDictionary[zipcode] = {'Zipcode' : zipcode,
+                'NumApartments': aptCount,
                 'RentalAptPrices': np.sum(zipPrices)/len(zipPrices), 
                 'RentalAptNumBedrooms': np.sum(nonNullBedroomsList)/len(nonNullBedroomsList),
                 'RentalAptSquareFeet': np.sum(nonNullSFList)/len(nonNullSFList),
@@ -176,8 +177,6 @@ def getData():
             notNullPrice = notNullPrice + 1
             avgPriceList.append(float(avgPrices))
        
-
-    
     df_raw = pd.DataFrame(allData_list, columns = col_names)
     df_raw.to_excel("RawCraigslistData.xlsx")
     
@@ -185,78 +184,53 @@ def getData():
     df_summary.to_excel("AggregateCraigslistData.xlsx")
     
     return df_summary
+ 
+def getExcelData():
+    df_CraigslistExcelData = pd.read_excel("AggregateCraigslistData.xlsx")
+    df_CraigslistExcelData = df_CraigslistExcelData.set_index('Zipcode')
+    
+    df_AllCraigslistExcelData = pd.read_excel("RawCraigslistData.xlsx")
+    df_AllCraigslistExcelData = df_AllCraigslistExcelData.set_index('Zipcode')
+    
+    return {'alldata' : df_AllCraigslistExcelData, 'aggregateData' : df_CraigslistExcelData}
+
     
 #Finding all non null price values
-def getOverallAggregateData(df):
-    pricesNotNull = 0
-    listPricesNotNull = []
-    for price in prices:
-        if price is not np.nan:
-            pricesNotNull = pricesNotNull + 1
-            listPricesNotNull.append(float(price))
-            
-    #Finding all non null bedroom values        
-    bedroomsNotNull = 0
-    listBedroomsNotNull = []
-    for beds in bedrooms:
-        if beds is not np.nan:   
-            bedroomsNotNull = bedroomsNotNull + 1
-            listBedroomsNotNull.append(float(beds))
-            
-    #Finding all non null square footage values        
-    sfNotNull = 0
-    listSFNotNull = []
-    for sf in squareFootage:
-        if sf is not np.nan:  
-            sfNotNull = sfNotNull + 1
-            listSFNotNull.append(float(sf))
+def getOverallAggregateData():
+    dataDict = getExcelData()
+    df = dataDict['aggregateData']
+    df = df.dropna()
+    df = df[(df.NumApartments !=0) & (df.RentalAptNumBedrooms != 0) & (df.RentalAptPrices !=0) & (df.RentalAptSquareFeet !=0) & (df.RentalPricePerBedroom !=0)]
     
-    # filter out all null prices for graphing ability
-    notNull = 0
-    avgPricePerBedNotNull = []
-    for avgPrices in avgPricePerBedroom:
-        if avgPrices is not np.nan:
-            notNull = notNull + 1
-            avgPricePerBedNotNull.append(float(avgPrices))
-            
-    # filter out all null prices for graphing ability        
-    notNullPrice = 0
-    avgPriceList = []
-    for avgPrices in prices:
-        if avgPrices is not np.nan:
-            notNullPrice = notNullPrice + 1
-            avgPriceList.append(float(avgPrices))
-            
-    #Removing outliers for prices histogram
-    mean = np.mean(avgPriceList)
-    sd = np.std(avgPriceList)
-    final_prices = [x for x in prices if (x > mean - 2 * sd)]
-    final_prices = [x for x in final_prices if (x < mean + 2 * sd)]
+    num_bins = 25
     
-    #Plot of all average prices per zipcode
-    avgAllPrices_df = pd.DataFrame(final_prices)
-    avgAllPrices_df.hist(bins = 30, color = 'skyblue')
-    plt.title("Distribution of Average Rental Prices\nAllegheny County Zip Codes Listings (Removing Outliers)")
+    df_RentalAptPrices = df['RentalAptPrices']
+    plt.title("Distribution of Average Rental Prices by Zip")
+    plt.xlabel("Price")
+    plt.ylabel("Frequency")
+    plt.hist(df_RentalAptPrices, num_bins, color = 'skyblue') 
     plt.show()
     
-    #Plot of all average prices per bedroom per zip code
-    avgPrice_df = pd.DataFrame(avgPricePerBedNotNull)
-    avgPrice_df.hist(bins=50, color = 'navy')
-    plt.title("Distribution of Average Prices Per Bedroom")
+    df_PricePerBedroom = df['RentalPricePerBedroom']
+    plt.title("Distribution of Average Rental Price Per Bedroom by Zip")
+    plt.xlabel("Price")
+    plt.ylabel("Frequency")
+    plt.hist(df_PricePerBedroom, num_bins, color = 'skyblue') 
     plt.show()
-  
-#    print('******************************************************')        
-#    print('Total Number of Apartment Listings: ', df['NumApartments'].sum())
-#    print('Average price of all listings: ', "{0:.2f}".format(np.sum(listPricesNotNull)/pricesNotNull))
-#    print('Average number of bedrooms per listing: ', "{0:.2f}".format(np.sum(listBedroomsNotNull)/bedroomsNotNull))
-#    print('Average square footage per listing: ' "{0:.2f}".format(np.sum(listSFNotNull)/sfNotNull))
-#    print('Average price per bedroom: ', "{0:.2f}".format(np.sum(listPricesNotNull)/np.sum(listBedroomsNotNull)))
-#    print('******************************************************')
-
+    
+    df_SquareFootage = df['RentalAptSquareFeet']
+    x = [n for n in df_RentalAptPrices]
+    y = [n for n in df_SquareFootage]
+    plt.title("Average Rental Price and Square Footage by Zip")
+    plt.xlabel("Price")
+    plt.ylabel("Square Footage")
+    plt.scatter(x, y, num_bins, color = 'skyblue') 
+    plt.show()
+    
 
 def main():
-    df = getData()
-    getOverallAggregateData(df)
+#    df = getData()
+    getOverallAggregateData()
 
 if __name__ == '__main__':
     main()

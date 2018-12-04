@@ -286,8 +286,6 @@ def getMacroChart():
     df = df.dropna()
     df = df[(df.restaurantCount !=0) & (df.barCount != 0) & (df.groceryCount !=0)]
     df_restaurantCount = df['restaurantCount']
-
-
     
     num_bins = 16
     plt.title("Distribution of Restaurants by Zip")
