@@ -112,7 +112,7 @@ def showGraphs(zipcode):
     
     if zipcode == 'all':
         yd.getMacroChart()
-        cc.getOverallAggregateData()
+        cc.getOverallAggregateData(cc.getData())
     
     else:
         yd.getMicroChart(str(zipcode))

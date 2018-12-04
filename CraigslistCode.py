@@ -187,7 +187,7 @@ def getData():
     return df_summary
     
 #Finding all non null price values
-def getOverallAggregateData():
+def getOverallAggregateData(df):
     pricesNotNull = 0
     listPricesNotNull = []
     for price in prices:
@@ -256,7 +256,7 @@ def getOverallAggregateData():
 
 def main():
     df = getData()
-    getOverallAggregateData()
+    getOverallAggregateData(df)
 
 if __name__ == '__main__':
     main()
