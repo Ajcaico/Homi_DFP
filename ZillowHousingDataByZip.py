@@ -80,6 +80,7 @@ if (yesterday > lastLoaded):
     z = zipfile.ZipFile(io.BytesIO(r.content))
     z.extractall()
 
+# read from csv files the Lat and Long coordinates of each zipcode
 with open('ZipcodeCoordinates.csv') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader:
@@ -93,8 +94,11 @@ with open('Zip\\Zip_MedianValuePerSqft_AllHomes.csv') as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader:
         if (row['State'] == 'PA') and (row['RegionName'] in zillowPriceDict) and (row['2018-09'] != ""):
+            # add ppsf for zipcode to dictionary
             zillowPriceDict[row['RegionName']]['medSalePPSF'] = float(row['2018-09'])
-            
+            # add same ppsf to zipcodes pricing score. Will be divided by max at end to get true score
+            zillowPriceDict[row['RegionName']]['housingPriceScore'] = float(row['2018-09'])
+
 # med sale of 1 bed   
 with open('Zip\\Zip_Zhvi_1bedroom.csv') as csv_file:
     csv_reader = csv.DictReader(csv_file)
@@ -148,16 +152,13 @@ df = pd.DataFrame(zillowPriceDict).T
 MedPPSF = df['medSalePPSF'].median()
 MaxPPSF = df['medSalePPSF'].max()
 
-print(df)
-for i in df:
-    df['housingPriceScore'] = df.loc[i, 'housingPriceScore'] / MaxPPSF
 
-print(df['housingPriceScore'])
 # fill in empty pricing values with min because they're likely rural
 df['medSalePPSF'] = df['medSalePPSF'].fillna(value=min(df['medSalePPSF']))
+df['housingPriceScore'] = df['housingPriceScore'].fillna(value=min(df['housingPriceScore']))
 df['medSalePerBed'] = df['medSalePerBed'].fillna(value=min(df['medSalePerBed']))
 
-
+df['housingPriceScore'] = round((df['housingPriceScore'] / MaxPPSF) * 5, 1)
 
 
 #function to return zillowDataDictionary when called from main file
@@ -192,7 +193,6 @@ def zillowBarChart(*args):
             PricePerBed.append(df.loc[i, 'medSalePerBed'])
     
     zipsBarDF = pd.DataFrame({'zips': zips, 'PPSF': PPSF, 'medSalePrice': PricePerBed})
-    
     
     fig = plt.figure() # Create matplotlib figure
     ax = fig.add_subplot(111) # Create matplotlib axes
