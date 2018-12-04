@@ -83,10 +83,7 @@ def getUserInput():
 
 def calculateOverallScore(inputDict):
     df_yelp = yd.getOverallRating()
-    df_yelp['restaurantScore'] = df_yelp['restaurantScore'].fillna(value=0)
-    df_yelp['barScore'] = df_yelp['barScore'].fillna(value=0)
-    df_yelp['groceryScore'] = df_yelp['groceryScore'].fillna(value=0)
-    
+   
 
     df_overall = df_yelp
     # result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop, df_arrests], axis=1, join='outer')

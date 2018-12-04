@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 
 
@@ -37,7 +38,7 @@ result_list = []
 
 category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
 
-'''
+
 zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
                 '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
                 '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
@@ -50,8 +51,8 @@ zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104',
                 '15239','15241','15243','15260','15290','15142','15075','15076','16055','15143',
                 '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
                 '15122','15089','15090','15148']
-'''
 
+'''
 #excluding zip codes that have no responses
 zipcode_list = ['15101','15003','15005','15102','15014','15104','15017','15020','15106','15024','15025','15026','15108','15030','15046',
 '15031','15110','15035','15112','15037','15332','15044','15045','15116','15120','15126','15642','15056','16046','15057',
@@ -60,7 +61,7 @@ zipcode_list = ['15101','15003','15005','15102','15014','15104','15017','15020',
 '15219','15220','15221','15222','15223','15224','15225','15226','15227','15228','15229','15232','15233','15234','15235',
 '15236','15237','15238','15239','15241','15075','15076','16055','15143','15129','15144','15082','15084','15085','15145',
 '16059','15147','15086','15088','15122','15089','15090','15148']
-
+'''
 
 #zipcode_list = ['15221']
 #category_list = ['American', 'Asian']
@@ -258,6 +259,9 @@ def getOverallRating():
     df_yelpOverallScore = pd.read_excel('YelpOverallRating.xlsx')
     df_yelpOverallScore = df_yelpOverallScore[['zipcode', 'restaurantScore', 'barScore', 'groceryScore']]
     df_yelpOverallScore = df_yelpOverallScore.set_index('zipcode')
+    df_yelpOverallScore['restaurantScore'] = df_yelpOverallScore['restaurantScore'].fillna(value=0)
+    df_yelpOverallScore['barScore'] = df_yelpOverallScore['barScore'].fillna(value=0)
+    df_yelpOverallScore['groceryScore'] = df_yelpOverallScore['groceryScore'].fillna(value=0)
     return df_yelpOverallScore
         
 def getDatafromExcel():
@@ -331,13 +335,20 @@ def getMicroChart(zipcode):
     ax2.set_ylabel('Average Rating (Dark Blue)')
     ax.set_xlabel('Category')
     ax.set_title('Restaurants by Count and Rating for Zip Code: ' + str(zipcode))
-    
     plt.show()
+
+
+'''    
+    key1 = patches.Patch(color = 'skyblue', label = 'Count')
+    key2 = patches.Patch (Color = 'navy', label = 'Rating')
+    plt.legend(handles = [key1, key2])
+ '''   
+    
     
 
 def main():
  
-   # getData()
+    getData()
     getMacroChart()
     getMicroChart('15222')
 
