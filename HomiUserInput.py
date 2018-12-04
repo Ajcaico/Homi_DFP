@@ -13,6 +13,8 @@ firstZip = 0
 secondZip = 0
 thirdZip = 0
 
+
+
 def getUserInput():
     print("Rate your importance for each category on a scale of 1-5 then press enter, 1 being not important and 5 being very important")
    
@@ -81,9 +83,9 @@ def getUserInput():
 
 def calculateOverallScore(inputDict):
     df_yelp = yd.getOverallRating()
-    df_yelp['restaurantScore'] = df_yelp['restaurantScore'].fillna(df_yelp['restaurantScore'].median())
-    df_yelp['barScore'] = df_yelp['barScore'].fillna(df_yelp['barScore'].median())
-    df_yelp['groceryScore'] = df_yelp['groceryScore'].fillna(df_yelp['groceryScore'].median())
+    df_yelp['restaurantScore'] = df_yelp['restaurantScore'].fillna(value=0)
+    df_yelp['barScore'] = df_yelp['barScore'].fillna(value=0)
+    df_yelp['groceryScore'] = df_yelp['groceryScore'].fillna(value=0)
     
 
     df_overall = df_yelp
@@ -125,6 +127,10 @@ def showGraphs(zipcode):
 #Start calling functions 
     
 calculateOverallScore(getUserInput())
+
+
+
+
 
 viewGraph = 'Y'
 while(viewGraph == 'Y'):
