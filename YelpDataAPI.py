@@ -18,9 +18,9 @@ import matplotlib.pyplot as plt
 
 
 
-API_KEY= 'ag6RO1gG16UhJzSO-88XdFrpzaNgOpUwaxOkkXco4QvyOXyAdkyih7yGiq5iIGCbZ6rsSPJedkakFpeX0rZGeUfAr7zuWsXkwT6XCZGYSKi2ntPRsJkV00anQCjmW3Yx' 
+#API_KEY= 'ag6RO1gG16UhJzSO-88XdFrpzaNgOpUwaxOkkXco4QvyOXyAdkyih7yGiq5iIGCbZ6rsSPJedkakFpeX0rZGeUfAr7zuWsXkwT6XCZGYSKi2ntPRsJkV00anQCjmW3Yx' 
 
-#API_KEY = 'Zuso4ntCFv_QaB4i4a6K4j0R0meRcdJ6Lum873qy36Y6gN2diK9iCLlnqFX-GYtWH5fSN-I8NUFYhTyTcx8PhamgxYkCSD4MkmJ4lzTasDn99cWZjV9f9bgLFHD0W3Yx'
+API_KEY = 'Zuso4ntCFv_QaB4i4a6K4j0R0meRcdJ6Lum873qy36Y6gN2diK9iCLlnqFX-GYtWH5fSN-I8NUFYhTyTcx8PhamgxYkCSD4MkmJ4lzTasDn99cWZjV9f9bgLFHD0W3Yx'
 
 
 # API constants, you shouldn't have to change these.
@@ -29,7 +29,7 @@ SEARCH_PATH = '/v3/businesses/search'
 BUSINESS_PATH = '/v3/businesses/'  # Business ID will come after slash.
 
 # Defaults for our simple example.
-SEARCH_LIMIT = 50
+SEARCH_LIMIT = 40
 
 zip_summary = {}
 result_list = []
@@ -37,7 +37,7 @@ result_list = []
 
 category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
 
-
+'''
 zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
                 '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
                 '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
@@ -50,10 +50,18 @@ zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104',
                 '15239','15241','15243','15260','15290','15142','15075','15076','16055','15143',
                 '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
                 '15122','15089','15090','15148']
+'''
+#excluding zip codes that have no responses
+zipcode_list = ['15101','15003','15005','15102','15014','15104','15017','15020','15106','15024','15025','15026','15108','15030','15046',
+'15031','15110','15035','15112','15037','15332','15044','15045','15116','15120','15126','15642','15056','16046','15057',
+'15136','15131','15132','15133','15135','15063','15146','15668','15065','15068','15137','15071','15139','15201','15202',
+'15203','15205','15206','15207','15208','15209','15210','15211','15212','15213','15214','15215','15216','15217','15218',
+'15219','15220','15221','15222','15223','15224','15225','15226','15227','15228','15229','15232','15233','15234','15235',
+'15236','15237','15238','15239','15241','15075','15076','16055','15143','15129','15144','15082','15084','15085','15145',
+'16059','15147','15086','15088','15122','15089','15090','15148']
 
 
-
-#zipcode_list = ['15122', '15221', '15235', '15232', '15237']
+#zipcode_list = ['15221']
 #category_list = ['American', 'Asian']
 
 
@@ -189,12 +197,12 @@ def getSummaryData(df):
     df_summary = pd.DataFrame(summaryResultList, columns = col_names)
  #  df_summary = df_summary.set_index('zipcode')
  
-    df_summary.to_excel('YelpSummaryData.xlsx')
+    df_summary.to_excel('YelpSummaryData.xlsx') 
     print('YelpSummaryData.xlsx updated')
     
     df_summaryTop = df_summary[df_summary.category == 'All Restaurants'] # returns 1 row for zipcode for all records cumulative
     df_summaryTop = df_summaryTop.set_index('zipcode')
-    df_summaryTop.to_excel('YelpSummaryTop.xlsx')
+    df_summaryTop.to_excel('YelpSummaryTop.xlsx') 
     print('YelpSummaryTop.xlsx updated')
     
     return {'topSummary': df_summaryTop, 'summary': df_summary}
@@ -239,11 +247,17 @@ def calculateRating(df, df_summary):
        
     col_names = ['zipcode', 'restaurantCount', 'restaurantVariety', 'restuarantRating', 'restaurantScore', 'barCount', 'barRating', 'barScore', 'groceryCount', 'groceryRating', 'groceryScore']
     df_ratings = pd.DataFrame(ratings, columns = col_names)
+    df_ratings = df_ratings.set_index('zipcode')
     
     print('YelpOverallRating.xlsx updated')
-    df_ratings.to_excel('YelpOverallRating.xlsx')
+    df_ratings.to_excel('YelpOverallRating.xlsx') 
     return df_ratings
 
+def getOverallRating():
+    df_yelpOverallScore = pd.read_excel('YelpOverallRating.xlsx')
+    df_yelpOverallScore = df_yelpOverallScore[['zipcode', 'restaurantScore', 'barScore', 'groceryScore']]
+    df_yelpOverallScore = df_yelpOverallScore.set_index('zipcode')
+    return df_yelpOverallScore
         
 def getDatafromExcel():
     
@@ -271,9 +285,8 @@ def getMacroChart():
     df = df.dropna()
     df = df[(df.restaurantCount !=0) & (df.barCount != 0) & (df.groceryCount !=0)]
     df_restaurantCount = df['restaurantCount']
-  #  df_restaurantCount = df_restaurantCount[(df_restaurantCount.restaurantCount != 0)]
- #   df_restaurantCount = df_restaurantCount.dropna()
-    print(df_restaurantCount)
+
+
     
     num_bins = 16
     plt.title("Distribution of Number of Restaurants by Zip")
@@ -283,8 +296,6 @@ def getMacroChart():
     plt.show()
     
     df_barCount = df['barCount']
-#    df_barCount = df_barCount[df_barCount.barCount != 0]
- #   df_barCount = df_barCount.dropna()
     plt.title("Distribution of Number of Bars by Zip")
     plt.xlabel("Number of Bars")
     plt.ylabel("Frequency")
@@ -292,7 +303,6 @@ def getMacroChart():
     plt.show()
     
     df_groceryCount = df['groceryCount']
- #   df_groceryCount = df_groceryCount.dropna()
     plt.title("Distribution of Number of Grocery by Zip")
     plt.xlabel("Number of Grocery Stores")
     plt.ylabel("Frequency")
@@ -327,7 +337,7 @@ def getMicroChart(zipcode):
 
 def main():
  
- #   getData()
+    getData()
     getMacroChart()
     getMicroChart('15222')
 
