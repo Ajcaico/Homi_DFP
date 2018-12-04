@@ -5,6 +5,8 @@ Created on Mon Dec  3 21:48:31 2018
 @author: ajcai
 """
 import YelpDataAPI as yd
+import CraigslistCode as cc
+import GetZipcodeRentalPricePlot as rp
 
 firstZip = 0
 secondZip = 0
@@ -108,13 +110,14 @@ def calculateOverallScore(inputDict):
 
 def showGraphs(zipcode):
     
-    
     if zipcode == 'all':
         yd.getMacroChart()
+        cc.getOverallAggregateData()
     
     else:
         yd.getMicroChart(str(zipcode))
-    
+        rp.getZipcodePlot(int(zipcode))
+  
     
     
 #Start calling functions 

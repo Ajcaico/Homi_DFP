@@ -274,7 +274,7 @@ def getDatafromExcel():
     df_yelpOverallScore = pd.read_excel('YelpOverallRating.xlsx')
     df_yelpOverallScore = df_yelpOverallScore.set_index('zipcode')
     
-    print('Retrieved Yelp Data from Excel')
+  #  print('Retrieved Yelp Data from Excel')
     return {'allData' : df_allYelpData, 'summaryData': df_yelpSummary, 'topSummaryData' : df_yelpSummaryTop, 'overallScore' : df_yelpOverallScore}
     
 
@@ -290,21 +290,21 @@ def getMacroChart():
 
     
     num_bins = 16
-    plt.title("Distribution of Number of Restaurants by Zip")
+    plt.title("Distribution of Restaurants by Zip")
     plt.xlabel("Number of Restaurants")
     plt.ylabel("Frequency")
     plt.hist(df_restaurantCount, num_bins, color = 'skyblue') 
     plt.show()
     
     df_barCount = df['barCount']
-    plt.title("Distribution of Number of Bars by Zip")
+    plt.title("Distribution of Bars by Zip")
     plt.xlabel("Number of Bars")
     plt.ylabel("Frequency")
     plt.hist(df_barCount, num_bins, color = 'skyblue') 
     plt.show()
     
     df_groceryCount = df['groceryCount']
-    plt.title("Distribution of Number of Grocery by Zip")
+    plt.title("Distribution of Grocery Stores by Zip")
     plt.xlabel("Number of Grocery Stores")
     plt.ylabel("Frequency")
     plt.hist(df_groceryCount, num_bins, color = 'skyblue') 
@@ -332,7 +332,7 @@ def getMicroChart(zipcode):
     ax.set_ylabel('Count (Light Blue)')
     ax2.set_ylabel('Average Rating (Dark Blue)')
     ax.set_xlabel('Category')
-    ax.set_title('Restaurants by Count and Rating for zip code: ' + str(zipcode))
+    ax.set_title('Restaurants by Count and Rating for Zip Code: ' + str(zipcode))
     
     plt.show()
     

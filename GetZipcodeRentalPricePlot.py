@@ -5,9 +5,11 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import ZillowHousingDataByZipWithMedianforBedrooms as zillow
 
 apartmentCount = 0
 prices = []
+avgPricePerBedroom = []
 squareFootage = []
 bedrooms = []
 titles = []
@@ -107,6 +109,8 @@ def getZipcodePlot(zipcode):
             if beds is not np.nan:   
                 nonNullBedrooms = nonNullBedrooms + 1
                 nonNullBedroomsList.append(float(beds))
+                
+        avgPricePerBedroom.append(np.sum(zipPrices)/np.sum(nonNullBedroomsList))
         
         nonNullSF = 0
         nonNullSFList = []
@@ -118,65 +122,59 @@ def getZipcodePlot(zipcode):
         #print(len(zipPrices))
         #print(len(zipBedrooms))
         #plt.style.use('seaborn-white')
-    
+    #Distribution of Prices
     plt.title("Distribution of Prices in Zip Code " + str(zipcode))
     plt.xlabel("Price")
     plt.ylabel("Number of Listings")
-    plt.hist(zipPrices, color = 'r') 
+    plt.hist(zipPrices, bins = 20, color = 'skyblue') 
     plt.show()
+        
+#    plt.title("Scatter Plot of Square Footage and Number of Bedrooms")
+#    plt.xlabel("Number of Bedrooms")
+#    plt.ylabel("Square Footage")
+#    plt.scatter(zipBedrooms, zipSquareFootage, alpha=0.5)
+#    plt.show()
     
-    plt.title("Distribution of Prices in Zip Code " + str(zipcode))
-    plt.xlabel("Price")
-    plt.ylabel("Number of Listings")
-    plt.hist(zipPrices, color = 'r') 
-    plt.show()
-    
-    plt.title("Scatter Plot of Square Footage and Number of Bedrooms")
-    plt.xlabel("Number of Bedrooms")
-    plt.ylabel("Square Footage")
-    plt.scatter(zipBedrooms, zipSquareFootage, alpha=0.5)
-    plt.show()
-    
-    np.random.seed(19680801)
-
-    n_bins = 15
-    x = zipPrices
-    
-    fig, axes = plt.subplots(nrows=2, ncols=2)
-    ax0, ax1, ax2, ax3 = axes.flatten()
-    
-    colors = ['red']
-    ax0.hist(x, histtype='bar', color=colors, label=colors)
-    ax0.set_title("Prices in Zip Code " + str(zipcode))
-    
-    ax1.hist(x, n_bins, histtype='bar', stacked=True)
-    ax1.set_title("Prices in Zip Code " + str(zipcode))
-    
-    x_multi1 = [n for n in [zipPrices, zipSquareFootage]]
-    ax2.hist(x_multi1, histtype='bar')
-    ax2.set_title("Prices and Square Footage in Zip Code " + str(zipcode))
-    
-    # Make a multiple-histogram of data-sets with different length.
-    x_multi = [n for n in [zipPrices, zipSquareFootage, zipBedrooms]]
-    
-    ax3.hist(x_multi, histtype='bar')
-    ax3.set_title('Square Footage and Price')
-    
-    fig.tight_layout()
-    plt.show()
+#    np.random.seed(19680801)
+#
+#    n_bins = 15
+#    x = zipPrices
+#    
+#    fig, axes = plt.subplots(nrows=2, ncols=2)
+#    ax0, ax1, ax2, ax3 = axes.flatten()
+#    
+#    colors = ['red']
+#    ax0.hist(x, histtype='bar', color=colors, label=colors)
+#    ax0.set_title("Prices in Zip Code " + str(zipcode))
+#    
+#    ax1.hist(x, n_bins, histtype='bar', stacked=True)
+#    ax1.set_title("Prices in Zip Code " + str(zipcode))
+#    
+#    x_multi1 = [n for n in [zipPrices, zipSquareFootage]]
+#    ax2.hist(x_multi1, histtype='bar')
+#    ax2.set_title("Prices and Square Footage in Zip Code " + str(zipcode))
+#    
+#    # Make a multiple-histogram of data-sets with different length.
+#    x_multi = [n for n in [zipPrices, zipSquareFootage, zipBedrooms]]
+#    
+#    ax3.hist(x_multi, histtype='bar')
+#    ax3.set_title('Square Footage and Price')
+#    
+#    fig.tight_layout()
+#    plt.show()
     
     # Fixing random state for reproducibility
     #np.random.seed(19680801)
         
-    N = len(zipSquareFootage)
-    x = zipSquareFootage
-    y = zipBedrooms
-    colors = np.random.rand(N)
-    area = [n for n in [zipPrices]]
-    plt.xlabel("Square Footage")
-    plt.ylabel("Number of Bedrooms")
-    plt.scatter(x, y, s=area, c=colors, alpha=0.5)
-    plt.show()
+#    N = len(zipSquareFootage)
+#    x = zipSquareFootage
+#    y = zipBedrooms
+#    colors = np.random.rand(N)
+#    area = [n for n in [zipPrices]]
+#    plt.xlabel("Square Footage")
+#    plt.ylabel("Number of Bedrooms")
+#    plt.scatter(x, y, s=area, c=colors, alpha=0.5)
+#    plt.show()
     
     if len(zipSquareFootage) < len(zipPrices):
         diff = len(zipPrices) - len(zipSquareFootage)
@@ -196,53 +194,54 @@ def getZipcodePlot(zipcode):
     for rooms in zipBedrooms:
         if rooms not in bedroomGroups:
             bedroomGroups.append(rooms)
+            
+    #Scatter plots comparing square footage, prices, and number of bedrooms
+#    colors = zipPrices
+#    plt.title("Scatter Plot of Square Footage and Price")
+#    plt.xlabel("Price")
+#    plt.ylabel("Square Footage")
+#    plt.scatter(zipPrices, zipSquareFootage, c=colors, alpha=0.5, cmap='viridis')
+#    plt.show()
     
-    colors = zipPrices
-    plt.title("Scatter Plot of Square Footage and Price")
-    plt.xlabel("Price")
-    plt.ylabel("Square Footage")
-    plt.scatter(zipPrices, zipSquareFootage, c=colors, alpha=0.5, cmap='viridis')
-    plt.show()
+#    plt.title("Scatter Plot of Number of Bedrooms and Price")
+#    plt.xlabel("Price")
+#    plt.ylabel("Number of Bedrooms")
+#    plt.scatter(zipPrices, zipBedrooms, c=colors, alpha=0.5, cmap='viridis')
+#    plt.show()
     
-    plt.title("Scatter Plot of Number of Bedrooms and Price")
-    plt.xlabel("Price")
-    plt.ylabel("Number of Bedrooms")
-    plt.scatter(zipPrices, zipBedrooms, c=colors, alpha=0.5, cmap='viridis')
-    plt.show()
-     
-    N = len(zipSquareFootage)
-    x = [n for n in [zipBedrooms]]
-    y = [n for n in [zipPrices]]
-    colors = [n for n in [zipBedrooms]]
-    area = [n for n in [zipSquareFootage]]
-    plt.title("Scatter Plot of Prices, Square Footage, and Num Bedrooms")
-    plt.xlabel("Bedrooms")
-    plt.ylabel("Price")
-    plt.scatter(x, y, s=area, c=colors, alpha=0.4, cmap='gist_stern')
-    plt.show()
+#    N = len(zipSquareFootage)
+#    x = [n for n in [zipBedrooms]]
+#    y = [n for n in [zipPrices]]
+#    colors = [n for n in [zipBedrooms]]
+#    area = [n for n in [zipSquareFootage]]
+#    plt.title("Scatter Plot of Prices, Square Footage, and Num Bedrooms")
+#    plt.xlabel("Bedrooms")
+#    plt.ylabel("Price")
+#    plt.scatter(x, y, s=area, c=colors, alpha=0.4, cmap='gist_stern')
+#    plt.show()
     
     N = len(zipSquareFootage)
     x = [n for n in [zipSquareFootage]]
     y = [n for n in [zipPrices]]
     colors = [n for n in [zipBedrooms]]
-    area = [n for n in [zipBedrooms]]
-    plt.title("Scatter Plot of Prices, Square Footage, and Num Bedrooms")
+    #area = [n for n in [zipBedrooms]]
+    plt.title("Scatter Plot of Prices, Square Footage, and Num Bedrooms\n Colors Are Number of Bedrooms from 1 - " + str(max(zipBedrooms)))
     plt.xlabel("Square Footage")
     plt.ylabel("Price")
     plt.scatter(x, y, c=colors, alpha=0.5, cmap='viridis')
     plt.show()
-    
-    N = len(zipSquareFootage)
-    x = [n for n in [zipSquareFootage]]
-    y = [n for n in [zipBedrooms]]
-    colors = [n for n in [zipBedrooms]]
-    area = [n for n in [zipPrices]]
-    plt.title("Scatter Plot of Prices, Square Footage, and Num Bedrooms")
-    plt.xlabel("Square Footage")
-    plt.ylabel("Bedrooms")
-    plt.scatter(x, y, s=area, c=colors, alpha=0.75, cmap='nipy_spectral')
-    #plt.legend(bedroomGroups)
-    plt.show()
+
+#    N = len(zipSquareFootage)
+#    x = [n for n in [zipSquareFootage]]
+#    y = [n for n in [zipBedrooms]]
+#    colors = [n for n in [zipBedrooms]]
+#    area = [n for n in [zipPrices]]
+#    plt.title("Scatter Plot of Prices, Square Footage, and Num Bedrooms")
+#    plt.xlabel("Square Footage")
+#    plt.ylabel("Bedrooms")
+#    plt.scatter(x, y, s=area, c=colors, alpha=0.75, cmap='nipy_spectral')
+#    #plt.legend(bedroomGroups)
+#    plt.show()
         
     numCols = [[1],[2]]
     listBedrooms = []
@@ -272,34 +271,125 @@ def getZipcodePlot(zipcode):
             if len(listSF) == 2:
                 listOfSF.append(listSF.copy())
                 listSF.clear()
-    
-    X = np.array(listOfPrices)
-    Y = np.array(listOfSF)
-    Z = np.array(listOfBedrooms)
-    
-    ##Surface plot
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-    ax.set_xlabel('Prices')
-    ax.set_ylabel('Square Footage')
-    ax.set_zlabel('Number of Bedrooms')
-    #ax.plot_surface(X, Y, Z, cmap='viridis')
-    #Axes3D.plot_surface(ax, X, Y, Z, cmap='coolwarm')
-   # plt.show()
-    
-    ##Wireframe plot
-    fig2 = plt.figure()
-    ax2 = plt.axes(projection='3d')
-    ax2.set_xlabel('Prices')
-    ax2.set_ylabel('Square Footage')
-    ax2.set_zlabel('Number of Bedrooms')
-    #Axes3D.plot_wireframe(ax2, X, Y, Z, cmap='plasma_r')
-    #plt.show()
-    
-    
         
+    # filter out all null prices for graphing ability
+    notNull = 0
+    avgPricePerBedNotNull = []
+    for avgPrices in avgPricePerBedroom:
+        if avgPrices is not np.nan:
+            notNull = notNull + 1
+            avgPricePerBedNotNull.append(float(avgPrices))
+    
+    # filter out all null prices for graphing ability        
+    notNullPrice = 0
+    avgPriceList = []
+    for avgPrices in prices:
+        if avgPrices is not np.nan:
+            notNullPrice = notNullPrice + 1
+            avgPriceList.append(float(avgPrices))
+       
+    #Removing outliers for prices histogram
+    mean = np.mean(avgPriceList)
+    sd = np.std(avgPriceList)
+    final_prices = [x for x in prices if (x > mean - 2 * sd)]
+    final_prices = [x for x in final_prices if (x < mean + 2 * sd)]
+    
+    #Plot of all average prices per zipcode
+    avgAllPrices_df = pd.DataFrame(final_prices)
+    avgAllPrices_df.hist(bins=15, color='skyblue')
+    plt.title("Distribution of Rental Prices for " + str(zipcode) + " (Removing Outliers)")
+    plt.xlabel("Price")
+    plt.ylabel("Frequency")
+    plt.show()
+    
+    #Plot of all average prices per bedroom per zip code
+#    avgPrice_df = pd.DataFrame(avgPricePerBedNotNull)
+#    avgPrice_df.hist(bins=15, color='navy')
+#    plt.title("Distribution of Average Rental Prices Per Bedroom in Zip Code " + str(zipcode))
+#    plt.show()
+    
+    #Find median price, bedrooms, and square footage
+    medianPrice = np.median(avgPriceList)
+    medianRooms = np.median(nonNullBedroomsList)
+    medianSF = np.median(nonNullSFList)
+    avgPrice = np.mean(avgPriceList)
+    avgRooms = np.mean(nonNullBedroomsList)
+    avgSF = np.mean(nonNullSFList)
+    
+    buyDict = zillow.zillowDataDictBedrooms()
+    
+    medSale1Bed = buyDict[str(zipcode)]['medSale1Bed']
+    medSale2Bed = buyDict[str(zipcode)]['medSale2Bed']
+    medSale3Bed = buyDict[str(zipcode)]['medSale3Bed']
+    medSale4Bed = buyDict[str(zipcode)]['medSale4Bed']
+    medSale5pBed = buyDict[str(zipcode)]['medSale5pBed']
+    
+#    print(medSale1Bed)
+#    print(medSale2Bed)
+#    print(medSale3Bed)
+#    print(medSale4Bed)
+#    print(medSale5pBed)
+    
+
+#    print("Median Square Footage: " + str(round(medianSF,2)))
+#    print("Average Square Footage: " + str(round(avgSF,2)))
+#    print("Median bedrooms: " + str(round(medianRooms,2)))
+#    print("Average bedrooms: " + str(round(avgRooms,2)))
+#    print("Median rent price: " + str(round(medianPrice,2)))
+#    print("Average rent price: " + str(round(avgPrice,2)))
+    
+    #Using typical 30 year fixed mortgage, 5% interest rate, $3,000 Annual Real Estate Taxes, $1500 annual insurance, $1675 annual PMI
+    interestRate = 5
+    term = 30
+    monthlyPropTaxes = 250
+    monthlyInsurance = 125
+    monthlyPMI = 139.67
+    
+    #Printing monthly payments for each size home
+    monthlyPMT1Bed = float(((float(medSale1Bed)*(float(interestRate)/100/12))/(1-
+                            ((1+(float(interestRate)/100/12))**(float(term)*(-12))))))+monthlyPropTaxes+monthlyInsurance+monthlyPMI
+#    print("Median 1 Bed PMT: " + str(round(monthlyPMT1Bed,2)))
+    monthlyPMT2Bed = float(((float(medSale2Bed)*(float(interestRate)/100/12))/(1-
+                            ((1+(float(interestRate)/100/12))**(float(term)*(-12))))))+monthlyPropTaxes+monthlyInsurance+monthlyPMI
+#    print("Median 2 Bed PMT: " + str(round(monthlyPMT2Bed,2)))
+    monthlyPMT3Bed = float(((float(medSale3Bed)*(float(interestRate)/100/12))/(1-
+                            ((1+(float(interestRate)/100/12))**(float(term)*(-12))))))+monthlyPropTaxes+monthlyInsurance+monthlyPMI
+#    print("Median 3 Bed PMT: " + str(round(monthlyPMT3Bed,2)))
+    monthlyPMT4Bed = float(((float(medSale4Bed)*(float(interestRate)/100/12))/(1-
+                            ((1+(float(interestRate)/100/12))**(float(term)*(-12))))))+monthlyPropTaxes+monthlyInsurance+monthlyPMI
+#    print("Median 4 Bed PMT: " + str(round(monthlyPMT4Bed,2)))
+    monthlyPMT5pBed = float(((float(medSale5pBed)*(float(interestRate)/100/12))/(1-
+                             ((1+(float(interestRate)/100/12))**(float(term)*(-12))))))+monthlyPropTaxes+monthlyInsurance+monthlyPMI
+#    print("Median 5+ Bed PMT: " + str(round(monthlyPMT5pBed,2)))
+    
+    #Combining list of all prices (averages and medians)
+    paymentList = [avgPrice, medianPrice, monthlyPMT1Bed, monthlyPMT2Bed, monthlyPMT3Bed, monthlyPMT4Bed, monthlyPMT5pBed]
+    
+    #Plot showing comparison between renting and buying
+    payList_df = pd.DataFrame(paymentList)
+    patch = payList_df.plot(kind = 'bar', color = 'navy')
+    plt.ylabel('Price')
+    plt.xticks(np.arange(7), ('Avg Rent', 'Med Rent', 'Med 1 Bed Buy', 'Med 2 Bed Buy', 'Med 3 Bed Buy', 'Med 4 Bed Buy', 'Med 5+ Bed Buy'))
+    plt.title("Rent vs Buy Comparison in Zip Code " + str(zipcode) + "\nAvgerage Number of Bedrooms for Rental is " + str(round(avgRooms, 2)))
+    bar_value_to_label = avgPrice
+    min_distance = min(paymentList)  # initialize min_distance with infinity
+    index_of_bar_to_label = 0
+    for i, rectangle in enumerate(patch.patches):  # iterate over every bar
+        tmp = abs(  # tmp = distance from middle of the bar to bar_value_to_label
+            (rectangle.get_x() +
+                (rectangle.get_width() * (1 / 2))) - bar_value_to_label)
+        if tmp < min_distance:  # we are searching for the bar with x cordinate
+                                # closest to bar_value_to_label
+            min_distance = tmp
+            index_of_bar_to_label = i
+    patch.patches[index_of_bar_to_label].set_color('skyblue')
+        
+    plt.show()
+    #Received above code help from https://stackoverflow.com/questions/35890738/change-color-of-selected-matplotlib-histogram-bin-bar-given-its-value/35894710 
+
+
 def main():
-    getZipcodePlot(15237)
+    getZipcodePlot(zipcode)
          
 if __name__ == '__main__':
     main()               
