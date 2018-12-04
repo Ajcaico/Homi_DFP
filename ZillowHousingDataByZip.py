@@ -203,9 +203,6 @@ def zillowBarChart():
     plt.show()
     
     
-    
-    
-    
     index = np.arange(len(args))
     bar_width = 0.35
     
@@ -218,68 +215,26 @@ def zillowBarChart():
     
     width = 0.2
     
-    zipsBarDF['PPSF'].plot(kind='bar', color='red', ax=ax, width=width, position=1)
-    zipsBarDF['medSalePrice'].plot(kind='bar', color='blue', ax=ax2, width=width, position=0)
+    zipsBarDF['PPSF'].plot(kind='bar', color='navy', ax=ax, width=width, position=1)
+    zipsBarDF['medSalePrice'].plot(kind='bar', color='skyblue', ax=ax2, width=width, position=0)
     ax.set_xticklabels(zipsBarDF['zips'])
     ax.set_ylim(0,1.3*zipsBarDF['PPSF'].max())
     ax2.set_ylim(0,1.3*zipsBarDF['medSalePrice'].max())
     
     ax.set_ylabel('Price / SqFoot')
     ax2.set_ylabel('Price Per Bedroom')
-    plt.legend(loc='best')
+    ax.legend(loc=1)
+    ax2.legend(loc=0)
+#    plt.legend(loc=0)
     
     plt.show()
-        
-#    ind = np.arange(3) 
-#    width = 0.35       
-#    plt.bar(ind, PPSF, width, label='Price/SqFoot')
-#    plt.bar(ind + width, PricePerBed, width, label='PricePerBed')
-#    
-#    plt.ylabel('Scores')
-#    plt.title('Scores by group and gender')
-#    
-#    plt.xticks(ind + width / 2, args)
-#    
-#    plt.show()
     
-    
-    
-    
-#    n_groups = 4
-#    means_frank = (90, 55, 40, 65)
-#    means_guido = (85, 62, 54, 20)
-# 
-#    # create plot
-#    fig, ax = plt.subplots()
-#    index = np.arange(n_groups)
-#    bar_width = 0.35
-#    opacity = 0.8
-# 
-#    rects1 = plt.bar(index, means_frank, bar_width,
-#                 alpha=opacity,
-#                 color='b',
-#                 label='Frank')
-# 
-#    rects2 = plt.bar(index + bar_width, means_guido, bar_width,
-#                 alpha=opacity,
-#                 color='g',
-#                 label='Guido')
-# 
-#    plt.xlabel('Person')
-#    plt.ylabel('Scores')
-#    plt.title('Scores by person')
-#    plt.xticks(index + bar_width, ('A', 'B', 'C', 'D'))
-#    plt.legend()
-# 
-#    plt.tight_layout()
-#    plt.show()
 
-if __name__ == '__main__':  
+if __name__ == '__main__':
     zillowPriceDict
     for i in zillowPriceDict:
         print(i,zillowPriceDict[i])
     zillowBarChart()
-    
     # write dictionary to csv
     df.to_excel('ZipCodeMedHousingPrice.xlsx')
             
