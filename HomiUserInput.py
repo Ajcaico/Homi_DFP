@@ -7,6 +7,7 @@ Created on Mon Dec  3 21:48:31 2018
 import YelpDataAPI as yd
 import CraigslistCode as cc
 import GetZipcodeRentalPricePlot as rp
+import ZillowHousingDataByZip as zd
 
 firstZip = 0
 secondZip = 0
@@ -80,11 +81,10 @@ def getUserInput():
 
 def calculateOverallScore(inputDict):
     df_yelp = yd.getOverallRating()
-    df_yelp = df_yelp.dropna()
+    df_yelp['restaurantScore'] = df_yelp['restaurantScore'].fillna(df_yelp['restaurantScore'].median())
+    df_yelp['barScore'] = df_yelp['barScore'].fillna(df_yelp['barScore'].median())
+    df_yelp['groceryScore'] = df_yelp['groceryScore'].fillna(df_yelp['groceryScore'].median())
     
-    
-    print(df_yelp)
-
 
     df_overall = df_yelp
     # result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop, df_arrests], axis=1, join='outer')
