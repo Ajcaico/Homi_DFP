@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[104]:
 
 
 import requests, zipfile, io, csv
@@ -96,35 +96,20 @@ dfM = dfM.fillna(0)
 dfM['CrimeScoreP'] = (dfM['SIMP_ASSAULT_CRIME']*.2) + (dfM['AGGV_ASSAULT_CRIME']*.6) + (dfM['DRUG_CRIME']*.05) + (dfM['ROBBERY_CRIME']*.15)
 dfM['CrimeScore'] = (dfM['CrimeScoreP']/dfM['CrimeScoreP'].max())*5
 
-print(dfM.loc['15101'])
+# print(dfM.loc['15101'])  
 
-# creating lists of all data for individual zip code charts
-zipList = []
-allLists = []    
-    
+def arrestData():
+    return dfM
 
-# dropping all columns and keeping just the crime score
-dfM.drop(['ASSAULT_CRIME','SIMP_ASSAULT_CRIME','AGGV_ASSAULT_CRIME','DRUG_CRIME','ROBBERY_CRIME','ALL_CRIME','CrimeScoreP'], axis=1, inplace=True)
-zipcodes = dfM.index.tolist()
-records = dfM.values.tolist()
+def arrestDataScore():
+    # dropping all columns and keeping just the crime score
+    dfM.drop(['ASSAULT_CRIME','SIMP_ASSAULT_CRIME','AGGV_ASSAULT_CRIME','DRUG_CRIME','ROBBERY_CRIME','ALL_CRIME','CrimeScoreP'], axis=1, inplace=True)
+    return dfM
 
     
-def showCrimeGraphSingle():
-    ax = dfM.plot.bar(rot=0)
-    
-def showCrimeGraphAll():
-    dfC = dfM[dfM['CrimeScore'] != 0]
-    dfChart = dfC.plot.bar( y='CrimeScore', rot=0)
-    
-showCrimeGraphSingle()
-# print(zipList)
-# showCrimeGraphSingle(15233)
-# showCrimeGraphAll()
-
-# if __name__ == "__main__":
-# dfM.to_excel('AggregatedPittsburghCrimeData.xlsx')
-
-
+if __name__ == '__main__':         
+    # write dictionary to csv
+    dfM.to_excel('AggregatedPittsburghCrimeData.xlsx')
 
 
 # In[ ]:
