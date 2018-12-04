@@ -40,7 +40,7 @@ zipCodeList = ['15101','15003','15005','15006','15007','15102','15014','15104','
 
 # creating dictionary for storing pricing data found in files
 for z in zipCodeList:
-    zillowPriceDict[str(z)] = {'LAT': np.nan,'LNG': np.nan,'medSalePPSF': np.nan,'medSalePerBed': np.nan}
+    zillowPriceDict[str(z)] = {'LAT': np.nan,'LNG': np.nan,'medSalePPSF': np.nan,'medSalePerBed': np.nan,'housingPriceScore': np.nan}
     # create dictionary for calculating average price per bedroom of all house sales in each zipcode
     pricePerBedDict[str(z)] = {'SumOfSales': 0,'NumOfBedroomsSold': 0}
 
@@ -141,12 +141,22 @@ for key in zillowPriceDict:
         zillowPriceDict[key]['medSalePerBed'] = round(pricePerBedDict[key]['SumOfSales'] / pricePerBedDict[key]['NumOfBedroomsSold'], 2)
     
 
-#convert dictionary to dataframe
+# convert dictionary to dataframe
 df = pd.DataFrame(zillowPriceDict).T
 
+# create score for housing prices
+MedPPSF = df['medSalePPSF'].median()
+MaxPPSF = df['medSalePPSF'].max()
+
+print(df)
+for i in df:
+    df['housingPriceScore'] = df.loc[i, 'housingPriceScore'] / MaxPPSF
+
+print(df['housingPriceScore'])
 # fill in empty pricing values with min because they're likely rural
 df['medSalePPSF'] = df['medSalePPSF'].fillna(value=min(df['medSalePPSF']))
 df['medSalePerBed'] = df['medSalePerBed'].fillna(value=min(df['medSalePerBed']))
+
 
 
 
@@ -169,8 +179,7 @@ def housingHeatMap():
     sns.heatmap(data)
     plt.show()
 
-def zillowBarChart():
-    args = ['15232', '15133', '15063']
+def zillowBarChart(*args):
     zips = []
     PPSF = []
     PricePerBed = []
@@ -181,33 +190,9 @@ def zillowBarChart():
             zips.append(i)
             PPSF.append(df.loc[i, 'medSalePPSF'])
             PricePerBed.append(df.loc[i, 'medSalePerBed'])
-    print(zips)
-    print(PPSF)
     
     zipsBarDF = pd.DataFrame({'zips': zips, 'PPSF': PPSF, 'medSalePrice': PricePerBed})
-    print(zipsBarDF)
     
-    fig = plt.figure()
-    
-    ax = zipsBarDF['PPSF'].plot(kind="bar", alpha=0.7)
-    ax = fig.add_subplot(111)
-    
-    ax2 = ax.twinx()
-    ax2 = zipsBarDF['medSalePrice'].plot(kind="bar", alpha=0.7)
-#    ax2.plot(ax.get_xticks(),zipsBarDF['medSalePrice'],marker='o', linewidth=4)
-    
-    ax.set_xticklabels(zipsBarDF['zips'])
-    ax.set_ylim(0,1.3*zipsBarDF['PPSF'].max())
-    ax2.set_ylim(0,1.3*zipsBarDF['medSalePrice'].max())
-    ax2.grid(False)
-    plt.show()
-    
-    
-    index = np.arange(len(args))
-    bar_width = 0.35
-    
-    opacity = 0.4
-    error_config = {'ecolor': '0.3'}
     
     fig = plt.figure() # Create matplotlib figure
     ax = fig.add_subplot(111) # Create matplotlib axes
@@ -223,18 +208,21 @@ def zillowBarChart():
     
     ax.set_ylabel('Price / SqFoot')
     ax2.set_ylabel('Price Per Bedroom')
-    ax.legend(loc=1)
-    ax2.legend(loc=0)
-#    plt.legend(loc=0)
+    plt.title("Housing Prices By Zipcode")
+#    ax.legend(loc=1)
+#    ax2.legend(loc=0)
+##    plt.legend(loc=0)
     
     plt.show()
     
 
 if __name__ == '__main__':
     zillowPriceDict
-    for i in zillowPriceDict:
-        print(i,zillowPriceDict[i])
-    zillowBarChart()
+    
+#    for i in zillowPriceDict:
+#        print(i,zillowPriceDict[i])
+    
+    zillowBarChart('15232', '15133', '15063', '15090')
     # write dictionary to csv
     df.to_excel('ZipCodeMedHousingPrice.xlsx')
             
