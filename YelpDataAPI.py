@@ -18,9 +18,9 @@ import matplotlib.pyplot as plt
 
 
 
-#API_KEY= 'ag6RO1gG16UhJzSO-88XdFrpzaNgOpUwaxOkkXco4QvyOXyAdkyih7yGiq5iIGCbZ6rsSPJedkakFpeX0rZGeUfAr7zuWsXkwT6XCZGYSKi2ntPRsJkV00anQCjmW3Yx' 
+API_KEY= 'ag6RO1gG16UhJzSO-88XdFrpzaNgOpUwaxOkkXco4QvyOXyAdkyih7yGiq5iIGCbZ6rsSPJedkakFpeX0rZGeUfAr7zuWsXkwT6XCZGYSKi2ntPRsJkV00anQCjmW3Yx' 
 
-API_KEY = 'Zuso4ntCFv_QaB4i4a6K4j0R0meRcdJ6Lum873qy36Y6gN2diK9iCLlnqFX-GYtWH5fSN-I8NUFYhTyTcx8PhamgxYkCSD4MkmJ4lzTasDn99cWZjV9f9bgLFHD0W3Yx'
+#API_KEY = 'Zuso4ntCFv_QaB4i4a6K4j0R0meRcdJ6Lum873qy36Y6gN2diK9iCLlnqFX-GYtWH5fSN-I8NUFYhTyTcx8PhamgxYkCSD4MkmJ4lzTasDn99cWZjV9f9bgLFHD0W3Yx'
 
 
 # API constants, you shouldn't have to change these.
@@ -51,6 +51,7 @@ zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104',
                 '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
                 '15122','15089','15090','15148']
 '''
+
 #excluding zip codes that have no responses
 zipcode_list = ['15101','15003','15005','15102','15014','15104','15017','15020','15106','15024','15025','15026','15108','15030','15046',
 '15031','15110','15035','15112','15037','15332','15044','15045','15116','15120','15126','15642','15056','16046','15057',
@@ -292,21 +293,21 @@ def getMacroChart():
     plt.title("Distribution of Number of Restaurants by Zip")
     plt.xlabel("Number of Restaurants")
     plt.ylabel("Frequency")
-    plt.hist(df_restaurantCount, num_bins) 
+    plt.hist(df_restaurantCount, num_bins, color = 'skyblue') 
     plt.show()
     
     df_barCount = df['barCount']
     plt.title("Distribution of Number of Bars by Zip")
     plt.xlabel("Number of Bars")
     plt.ylabel("Frequency")
-    plt.hist(df_barCount, num_bins) 
+    plt.hist(df_barCount, num_bins, color = 'skyblue') 
     plt.show()
     
     df_groceryCount = df['groceryCount']
     plt.title("Distribution of Number of Grocery by Zip")
     plt.xlabel("Number of Grocery Stores")
     plt.ylabel("Frequency")
-    plt.hist(df_groceryCount, num_bins) 
+    plt.hist(df_groceryCount, num_bins, color = 'skyblue') 
     plt.show()
     
     
@@ -325,19 +326,20 @@ def getMicroChart(zipcode):
     ax2 = ax.twinx()
     width = 0.3
     
-    df_count['count'].plot(kind='bar', color = 'red', ax=ax, width=width, position = 1, align = 'center')
-    df_count['average_rating'].plot(kind='bar', color = 'blue', ax=ax2, width = width, position = 0, align = 'center')
+    df_count['count'].plot(kind='bar', color = 'skyblue', ax=ax, width=width, position = 1, align = 'center')
+    df_count['average_rating'].plot(kind='bar', color = 'navy', ax=ax2, width = width, position = 0, align = 'center')
     
-    ax.set_ylabel('Count (Red)')
-    ax2.set_ylabel('Average Rating (Blue)')
+    ax.set_ylabel('Count (Light Blue)')
+    ax2.set_ylabel('Average Rating (Dark Blue)')
     ax.set_xlabel('Category')
+    ax.set_title('Restaurants by Count and Rating for zip code: ' + str(zipcode))
     
     plt.show()
     
 
 def main():
  
-    getData()
+   # getData()
     getMacroChart()
     getMicroChart('15222')
 
