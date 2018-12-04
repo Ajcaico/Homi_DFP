@@ -81,11 +81,13 @@ def getUserInput():
 def calculateOverallScore(inputDict):
     df_yelp = yd.getOverallRating()
     df_yelp = df_yelp.dropna()
+    
+    
     print(df_yelp)
 
 
     df_overall = df_yelp
-
+    # result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop, df_arrests], axis=1, join='outer')
 
     df_overall['restaurantScore'] = df_overall['restaurantScore']*inputDict['restaurant']
     df_overall['barScore'] = df_overall['barScore']*inputDict['nightlife']
