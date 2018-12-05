@@ -169,7 +169,6 @@ def spyderChart(firstZip, secondZip, thirdZip):
     
     thirdZipDF = zip_scores.loc['15216'].T
     thirdZipDF.reset_index(drop=True, inplace=True)
-    print(thirdZipDF)
     
 
     # ------- PART 1: Create background
@@ -195,8 +194,8 @@ def spyderChart(firstZip, secondZip, thirdZip):
      
     # Draw ylabels
     ax.set_rlabel_position(0)
-    plt.yticks([1,2,3,4,5], ["0","1","2","3","4","5"], color="grey", size=7)
-    plt.ylim(0,6)
+    plt.yticks([0,1,2,3,4,5], ["0","1","2","3","4","5"], color="grey", size=7)
+    plt.ylim(-1,6)
     
     # ------- PART 2: Add plots
      
@@ -223,6 +222,7 @@ def spyderChart(firstZip, secondZip, thirdZip):
     
     # Add legend
     plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
+    plt.title("Zip Code Scores (1-5)\n")
     plt.show()  
     
     

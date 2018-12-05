@@ -486,7 +486,7 @@ def printMacroChart_M():
     blendScore.plot.hist(bins = 5, rwidth = 0.9, label=None)
     plt.title('Distribution of School Scores by Zip Code')
     plt.xlabel('Blended Score')
-    plt.axvline(blendScore_np.mean(), color='navy', linestyle='dashed', linewidth=1)
+    plt.axvline(blendScore_np.mean(), color='skyblue', linestyle='dashed', linewidth=1)
     plt.show()
     
     
@@ -543,10 +543,10 @@ def printZipCodeColumn_M(zipcode):
     width = 0.3
     
     df['county score'].plot(kind='bar', color='skyblue', ax=ax,width=width, position=1, align='center')
-    df['local zip score'].plot(kind='bar', color='blue', ax=ax2,width=width, position=0, align='center')
+    df['local zip score'].plot(kind='bar', color='navy', ax=ax2,width=width, position=0, align='center')
     
     local_patch = mpatches.Patch(color='skyblue', label='Local Score')
-    county_patch = mpatches.Patch(color='blue', label='County Score')
+    county_patch = mpatches.Patch(color='navy', label='County Score')
     plt.legend(handles=[local_patch, county_patch])  
     
     plt.title("Allegheny County vs. Local School Metrics")

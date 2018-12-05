@@ -2,7 +2,8 @@
 # coding: utf-8
 
 # In[4]:
-
+# This py file reads a zip file from a zillow statistics website. This file contains a median
+# sales prices for all
 
 # See site: https://www.zillow.com/research/data/
 # Files to peruse:
