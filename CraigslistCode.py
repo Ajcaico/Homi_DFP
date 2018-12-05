@@ -13,7 +13,6 @@ from bs4 import BeautifulSoup as bs4
 import requests
 import numpy as np
 import matplotlib.pyplot as plt
-import statistics as stat
 import ZillowHousingDataByZipWithMedianforBedrooms as zillow
 
 ##ALl variables used in code
@@ -70,6 +69,7 @@ def find_size_and_brs(size):
 
 #Function to return dataframe and csv containing all data (raw), and all aggregated zip code data.  Also prints data to consol.
 def getData():
+    print('Scraping Craigslist rental listings...')
     url_base = 'https://pittsburgh.craigslist.org/d/apts-housing-for-rent/search/apa'
     for zipcode in zipcodes:
         params = dict(postal=zipcode)
@@ -222,6 +222,7 @@ def getData():
     df_summary = pd.DataFrame(zipDictionary).T
     df_summary.to_excel("AggregateCraigslistData.xlsx")
     
+    print('Craigslist scraping complete!')
     return df_summary
  
 def getExcelData():
