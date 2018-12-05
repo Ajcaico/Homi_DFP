@@ -5,7 +5,7 @@
     This file also creates specific zip code graphs with getZipcodePlot() function
     This file also creates aggregated graphs for all zip codes with getOverallAggregateData() function
     This file is imported by HomiUserInput.py
-    This file imports ZillowHousingDataByZipWithMedianforBedrooms, pandas, BeautifulSoup, requests, numpy, matplotlib.pyplot, and statistics
+    This file imports ZillowHousingDataByZipWithMedianforBedrooms, pandas, BeautifulSoup, requests, numpy, and matplotlib.pyplot
 """
 
 import pandas as pd

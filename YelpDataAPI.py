@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Nov  9 19:02:49 2018
+Group 5, Colton Mouritsen, Amanda Baker, Alex Caico, Dan Lesser, Joe Standerfer
 
-@author: ajcai
+Sends Yelp API requests, which returns JSONs for each business that meets the search criteria
+Retrieves necessary data from JSONs and creates a dataframe, which is written to excel
+Creates graph based data cleaned data from Yelp responses
+
+Credit: Yelp API functions (request, search, get_business, and query_api) taken from Yelp developer github. 
+These functions were copied and adjusted to fit the needs for this program
+https://github.com/Yelp/yelp-fusion/tree/master/fusion/python
+
 """
+
 from __future__ import print_function
 import argparse
 import requests
@@ -14,14 +22,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-
-#Sends Yelp API requests, which returns JSONs for each business that meets the search criteria
-#Retrieves necessary data from JSONs and creates a dataframe, which is written to excel
-#Creates graph based data cleaned data from Yelp responses
-
-#Credit: Yelp API functions (request, search, get_business, and query_api) taken from Yelp developer github. 
-#These functions were copied and adjusted to fit the needs for this program
-#https://github.com/Yelp/yelp-fusion/tree/master/fusion/python
 
 
 #Yelp API keys required for sending requests, 5,000 limit per day. Switch to other API_KEY if limit is reached
@@ -59,7 +59,7 @@ def getData():
     
     print('Starting Yelp API requests')
     totalRequests = len(zipcode_list) * len(category_list)
-    print('Approximately 3-5 minutes for each 100 API requests')
+    print('Approximately 3-5 minutes for every 100 API requests')
     print(str(totalRequests) + ' API requests will be made')
     
     count = 0
@@ -320,18 +320,12 @@ def getMicroChart(zipcode):
     ax.set_title('Restaurants by Count and Rating for Zip Code: ' + str(zipcode))
     plt.show()
 
-'''    
-    key1 = patches.Patch(color = 'skyblue', label = 'Count')
-    key2 = patches.Patch (Color = 'navy', label = 'Rating')
-    plt.legend(handles = [key1, key2])
- '''   
-    
 
 def main():
  
   #  getData()
     getMacroChart()
-    getMicroChart('15000')
+    getMicroChart('15232')
 
     
 if __name__ == '__main__':
