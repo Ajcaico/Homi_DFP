@@ -8,9 +8,7 @@ import ArrestData as arrests
 def getData(): 
 #Call functions from each .py file to get data
     
-    
     #DataFrames to use for aggregation
-  
     df_craigslistSummary = craig.getData()
     df_zillowSummary = zillow.zillowData()
     df_arrests = arrests.arrestData()
