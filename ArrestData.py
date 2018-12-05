@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[104]:
+# In[139]:
 
 
 import requests, zipfile, io, csv
@@ -12,6 +12,7 @@ import os
 import platform
 import datetime
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 zipCodeList = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
                  '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
@@ -94,26 +95,50 @@ dfM = dfM.fillna(0)
 # aggregate crime stats across crime type by zipcode
 # weights: Aggravated = .6, Simple = .2, Robbery = .15, Possession = .05
 dfM['CrimeScoreP'] = (dfM['SIMP_ASSAULT_CRIME']*.2) + (dfM['AGGV_ASSAULT_CRIME']*.6) + (dfM['DRUG_CRIME']*.05) + (dfM['ROBBERY_CRIME']*.15)
-dfM['CrimeScore'] = (dfM['CrimeScoreP']/dfM['CrimeScoreP'].max())*5
+dfM['CrimeScore'] = (dfM['CrimeScoreP']/(dfM['CrimeScoreP'].max()))*5
 
-# print(dfM.loc['15101'])  
 
 def arrestData():
     return dfM
 
 def arrestDataScore():
     # dropping all columns and keeping just the crime score
-    dfM.drop(['ASSAULT_CRIME','SIMP_ASSAULT_CRIME','AGGV_ASSAULT_CRIME','DRUG_CRIME','ROBBERY_CRIME','ALL_CRIME','CrimeScoreP'], axis=1, inplace=True)
+    #dfM.drop(['ASSAULT_CRIME','SIMP_ASSAULT_CRIME','AGGV_ASSAULT_CRIME','DRUG_CRIME','ROBBERY_CRIME','ALL_CRIME','CrimeScoreP'], axis=1, inplace=True)
     return dfM
 
+
+def macroCrimeStats():
+    dfC = dfM[dfM['CrimeScore'] != 0]
+    dfChart = dfC.plot.bar( y='CrimeScore', rot=0)
     
+def microCrimeStats(zipcode):
+    listTotalCrime = ['Total Crime', (dfM['ALL_CRIME'].loc[str(zipcode)])]
+    listAssault = ['Assaults', (dfM['ASSAULT_CRIME'].loc[str(zipcode)])]
+    listDrugs = ['Possession', (dfM['DRUG_CRIME'].loc[str(zipcode)])]
+    listRobbery = ['Robbery', (dfM['ROBBERY_CRIME'].loc[str(zipcode)])]    
+
+    listOfMetrics = [listTotalCrime, listAssault, listDrugs, listRobbery]
+
+    col_names = ['Crime Type', 'count']
+    df = pd.DataFrame(listOfMetrics, columns = col_names)
+    df = df.set_index('Crime Type')
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_ylabel("Count")
+    ax2 = ax.twinx()
+    width = 0.3
+
+    df['count'].plot(kind='bar', color='skyblue', ax=ax,width=width, position=1, align='center')
+
+    local_patch = mpatches.Patch(color='skyblue', label='Local Count')
+    plt.legend(handles=[local_patch])
+
+    plt.title("Allegheny County Crime Data")
+    plt.show()
+    
+
 if __name__ == '__main__':         
     # write dictionary to csv
     dfM.to_excel('AggregatedPittsburghCrimeData.xlsx')
-
-
-# In[ ]:
-
-
-
 

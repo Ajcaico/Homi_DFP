@@ -4,41 +4,48 @@ Created on Mon Dec  3 21:48:31 2018
 
 @author: ajcai
 """
+# import individual data sources
 import YelpDataAPI as yd
 import CraigslistCode as cc
 import GetZipcodeRentalPricePlot as rp
 import ZillowHousingDataByZip as zd
 import ArrestData as ar
 import PASchoolPerf_Extraction as ed
+
+# packages
 import pandas as pd
+import matplotlib.pyplot as plt
+from math import pi
 
-firstZip = 0
-secondZip = 0
-thirdZip = 0
+# variables
+firstZip = ''
+secondZip = ''
+thirdZip = ''
 
 
+# grab dataframes from individual sources using there .py files
 df_zillowSummary = zd.zillowData()
 df_craigslistSummary = cc.getData()
 df_arrests = ar.arrestData()
-df_education = ed.ReturnAggregate()
-# df_education = ed.getData().ReturnAggregate_Rebase()
+df_education = ed.ReturnAggregate_Rebase()
 df_yelp = yd.getOverallRating()
 
 # converting index from ints to string
 df_yelp.index = df_yelp.index.astype(str)
 
-# checking size of dataFrames to be combined
-print("zillow df size: ", df_zillowSummary.shape, "\n")
-print("craigslist df size: ", df_craigslistSummary.shape, "\n")
-print("Arrests df size: ", df_arrests.shape, "\n")
-print("Yelp df size: ", df_yelp.shape, "\n")
-print("Education df size: ", df_education.shape, "\n")
+#combine dataframes from sources
+aggregatedZipData = pd.concat([df_zillowSummary, df_craigslistSummary, df_arrests, df_education, df_yelp]
+                            , axis=1, join='outer')
+    
+#fill in any missing values with 0
+aggregatedZipData = aggregatedZipData.fillna(value=0)
 
-result = pd.concat([df_zillowSummary, df_craigslistSummary, df_arrests, df_yelp, df_education], axis=1, join='outer')
-result.to_excel('Result.xlsx')
-#result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop, df_arrests], axis=1, join='outer')
-##print(result)
+#print resulting dataframe out to excel
+aggregatedZipData.to_excel('Result.xlsx')
 
+# create dataframe for scores (0 - 5)
+zip_scores = aggregatedZipData[['BlendedScore_rebase','restaurantScore', 'barScore', 
+                                'groceryScore', 'housingPriceScore', 'CrimeScore']].round(1)
 
 
 def getUserInput():
@@ -108,54 +115,123 @@ def getUserInput():
 
 
 def calculateOverallScore(inputDict):
-    df_yelp = yd.getOverallRating()
-    df_yelp['restaurantScore'] = df_yelp['restaurantScore'].fillna(value=0)
-    df_yelp['barScore'] = df_yelp['barScore'].fillna(value=0)
-    df_yelp['groceryScore'] = df_yelp['groceryScore'].fillna(value=0)
+    # weighted scores df
+    weightScores = zip_scores.copy(deep=True)
     
-
-    df_overall = df_yelp
-    # result = pd.concat([df_zillowSummary, df_craigslistSummary, df_yelpSummaryTop, df_arrests], axis=1, join='outer')
-
-    df_overall['restaurantScore'] = df_overall['restaurantScore']*inputDict['restaurant']
-    df_overall['barScore'] = df_overall['barScore']*inputDict['nightlife']
-    df_overall['groceryScore'] = df_overall['groceryScore']*inputDict['grocery']
+    # weight scores based on user input
+    weightScores['restaurantScore'] = weightScores['restaurantScore']*inputDict['restaurant']
+    weightScores['barScore'] = weightScores['barScore']*inputDict['nightlife']
+    weightScores['groceryScore'] = weightScores['groceryScore']*inputDict['grocery']
+    weightScores['BlendedScore_rebase'] = weightScores['BlendedScore_rebase']*inputDict['education']
+    weightScores['housingPriceScore'] = weightScores['housingPriceScore']*4
+    #converting crime scores sp highest is the best safety rating
+    weightScores['CrimeScore'] = (((weightScores['CrimeScore'] - 5) * -1)*inputDict['crime']).abs()
     
+    # sum overall score in column
+    weightScores['overallScore'] = weightScores.sum(axis=1)
+    weightScores.to_excel('zipScores.xlsx')
+    weightScores.sort_values('overallScore', ascending = False, inplace = True)
     
-    df_overall['overallScore'] = df_overall['restaurantScore'] + df_overall['barScore'] + df_overall['groceryScore'] 
+    # save top three zipcodes
+    firstZip = str(weightScores.index.values[0])
+    secondZip = str(weightScores.index.values[1])
+    thirdZip = str(weightScores.index.values[2])
     
-    
-    df_overall = df_overall.sort_values('overallScore', ascending=False)
-    print(df_overall)
-
-    firstZip = df_overall.index.values[0]
-    secondZip = df_overall.index.values[1]
-    thirdZip = df_overall.index.values[2]
-
+    # print top three zipcodes
     print('Here are the top 3 zip codes based on your preferences: \n')
     print('1. ' + str(firstZip))
     print('2. ' + str(secondZip))
     print('3. ' + str(thirdZip))
+    
+    spyderChart(firstZip, secondZip, thirdZip)
 
+def spyderChart(firstZip, secondZip, thirdZip):
+    
+    # REFERENCE: https://python-graph-gallery.com/391-radar-chart-with-several-individuals/
+    # Set data
+    
+    firstZipDF = zip_scores.loc[firstZip].T
+    firstZipDF.reset_index(drop=True, inplace=True)
+    
+    secondZipDF = zip_scores.loc[secondZip].T
+    secondZipDF.reset_index(drop=True, inplace=True)
+    
+    thirdZipDF = zip_scores.loc[thirdZip].T
+    thirdZipDF.reset_index(drop=True, inplace=True)
+    
+    
 
+    # ------- PART 1: Create background
+     
+    # number of variable
+    categories=['Education','Restaurants', 'NightLife', 
+                                'Groceries', 'Housing', 'Safety']
+    N = len(categories)
+     
+    # What will be the angle of each axis in the plot? (we divide the plot / number of variable)
+    angles = [n / float(N) * 2 * pi for n in range(N)]
+    angles += angles[:1]
+     
+    # Initialise the spider plot
+    ax = plt.subplot(111, polar=True)
+     
+    # If you want the first axis to be on top:
+    ax.set_theta_offset(pi / 2)
+    ax.set_theta_direction(-1)
+     
+    # Draw one axe per variable + add labels labels yet
+    plt.xticks(angles[:-1], categories)
+     
+    # Draw ylabels
+    ax.set_rlabel_position(0)
+    plt.yticks([1,2,3,4,5], ["0","1","2","3","4","5"], color="grey", size=7)
+    plt.ylim(0,6)
+    
+    # ------- PART 2: Add plots
+     
+    # Plot each individual = each line of the data
+    # I don't do a loop, because plotting more than 3 groups makes the chart unreadable
+     
+    # Ind1
+    values=firstZipDF.values.flatten().tolist()
+    values += values[:1]
+    ax.plot(angles, values, linewidth=1, linestyle='solid', label=firstZip)
+    ax.fill(angles, values, 'b', alpha=0.1)
+     
+    # Ind2
+    values=secondZipDF.values.flatten().tolist()
+    values += values[:1]
+    ax.plot(angles, values, linewidth=1, linestyle='solid', label=secondZip)
+    ax.fill(angles, values, 'r', alpha=0.1)
+    
+    ## Ind3
+    values=thirdZipDF.values.flatten().tolist()
+    values += values[:1]
+    ax.plot(angles, values, linewidth=1, linestyle='solid', label=thirdZip)
+    ax.fill(angles, values, 'g', alpha=0.1)
+    
+    # Add legend
+    plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
+    plt.show()  
+    
+    
+    
 def showGraphs(zipcode):
     
     if zipcode == 'all':
         yd.getMacroChart()
         cc.getOverallAggregateData(cc.getData())
+        ed.printMacroChart_M()
     
     else:
         yd.getMicroChart(str(zipcode))
         rp.getZipcodePlot(int(zipcode))
-  
+        ed.printZipCodeColumn_M(zipcode)
     
     
 #Start calling functions 
     
 calculateOverallScore(getUserInput())
-
-
-
 
 
 viewGraph = 'Y'
