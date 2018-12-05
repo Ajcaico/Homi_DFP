@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[173]:
+# In[104]:
 
 
 import requests, zipfile, io, csv
 import pandas as pd
 import numpy as np
+import re
 import os
 import platform
 import datetime
+import matplotlib.pyplot as plt
 
 zipCodeList = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
                  '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
@@ -59,34 +61,52 @@ df1 = pd.DataFrame(df.OFFENSES.str.split(' ',1).tolist(), columns = ['OFFENSE_CO
 df1['ZIPCODE'] = df['ARRESTLOCATION'].str[-5:]
 
 # sorting crime by type
-df1['ASSAULT_CRIME'] = np.where(df1['OFFENSE_TYPE'].str.contains("Assault", case=False, na=False), 'Y', '')
-df1['SIMP_ASSAULT_CRIME'] = np.where(df1['OFFENSE_TYPE'].str.contains("Simple Assault", case=False, na=False), 'Y', '')
-df1['AGGV_ASSAULT_CRIME'] = np.where(df1['OFFENSE_TYPE'].str.contains("Aggravated Assault", case=False, na=False), 'Y', '')
-df1['DRUG_CRIME'] = np.where(df1['OFFENSE_TYPE'].str.contains("Possession", case=False, na=False), 'Y', '')
-df1['ROBBERY_CRIME'] = np.where(df1['OFFENSE_TYPE'].str.contains("Robbery", case=False, na=False), 'Y', '')
+df1['ALL_CRIME'] = np.where(df1['OFFENSE_TYPE'].str.contains(r'', case=False, na=False), 'Y', 0)
+df1['ASSAULT_CRIME'] = np.where(df1['OFFENSE_TYPE'].str.contains("Assault", case=False, na=False), 'Y', 0)
+df1['SIMP_ASSAULT_CRIME'] = np.where(df1['OFFENSE_TYPE'].str.contains("Simple Assault", case=False, na=False), 'Y', 0)
+df1['AGGV_ASSAULT_CRIME'] = np.where(df1['OFFENSE_TYPE'].str.contains("Aggravated Assault", case=False, na=False), 'Y', 0)
+df1['DRUG_CRIME'] = np.where(df1['OFFENSE_TYPE'].str.contains("Possession", case=False, na=False), 'Y', 0)
+df1['ROBBERY_CRIME'] = np.where(df1['OFFENSE_TYPE'].str.contains("Robbery", case=False, na=False), 'Y', 0)
 
 # aggregate crime counts per zipcode
 df2 = pd.DataFrame(df1[df1['OFFENSE_TYPE'].str.contains("Assault")].groupby('ZIPCODE')['ASSAULT_CRIME'].count())
 df3 = pd.DataFrame(df1[df1['OFFENSE_TYPE'].str.contains("Simple Assault")].groupby('ZIPCODE')['SIMP_ASSAULT_CRIME'].count())
 df4 = pd.DataFrame(df1[df1['OFFENSE_TYPE'].str.contains("Aggravated Assault")].groupby('ZIPCODE')['AGGV_ASSAULT_CRIME'].count())
-df4 = pd.DataFrame(df1[df1['OFFENSE_TYPE'].str.contains("Aggravated Assault")].groupby('ZIPCODE')['AGGV_ASSAULT_CRIME'].count())
+df4 = df4.multiply(2, axis='ZIPCODE', level=None, fill_value=0)
 df5 = pd.DataFrame(df1[df1['OFFENSE_TYPE'].str.contains("Possession")].groupby('ZIPCODE')['DRUG_CRIME'].count())
+df5 = df5.multiply(.25, axis='ZIPCODE', level=None, fill_value=0)
 df6 = pd.DataFrame(df1[df1['OFFENSE_TYPE'].str.contains("Robbery")].groupby('ZIPCODE')['ROBBERY_CRIME'].count())
+df6 = df6.multiply(.5, axis='ZIPCODE', level=None, fill_value=0)
+df7 = pd.DataFrame(df1[df1['OFFENSE_TYPE'].str.contains(r'')].groupby('ZIPCODE')['ALL_CRIME'].count())
 
-# aggregate crime count per zipcodde - attempt 1
+# organize crime count per zipcode, by crime type
 dfZ = pd.DataFrame(zipCodeList, columns=['ZIPCODE'])
 dfM = dfZ.merge(df2, how='left', on='ZIPCODE')
 dfM = dfM.merge(df3, how='left', on='ZIPCODE')
 dfM = dfM.merge(df4, how='left', on='ZIPCODE')
 dfM = dfM.merge(df5, how='left', on='ZIPCODE')
 dfM = dfM.merge(df6, how='left', on='ZIPCODE')
-
+dfM = dfM.merge(df7, how='left', on='ZIPCODE')
 dfM = dfM.set_index('ZIPCODE')
+dfM = dfM.fillna(0)
+
+
+# aggregate crime stats across crime type by zipcode
+# weights: Aggravated = .6, Simple = .2, Robbery = .15, Possession = .05
+dfM['CrimeScoreP'] = (dfM['SIMP_ASSAULT_CRIME']*.2) + (dfM['AGGV_ASSAULT_CRIME']*.6) + (dfM['DRUG_CRIME']*.05) + (dfM['ROBBERY_CRIME']*.15)
+dfM['CrimeScore'] = (dfM['CrimeScoreP']/dfM['CrimeScoreP'].max())*5
+
+# print(dfM.loc['15101'])  
 
 def arrestData():
     return dfM
 
+def arrestDataScore():
+    # dropping all columns and keeping just the crime score
+    dfM.drop(['ASSAULT_CRIME','SIMP_ASSAULT_CRIME','AGGV_ASSAULT_CRIME','DRUG_CRIME','ROBBERY_CRIME','ALL_CRIME','CrimeScoreP'], axis=1, inplace=True)
+    return dfM
 
+    
 if __name__ == '__main__':         
     # write dictionary to csv
     dfM.to_excel('AggregatedPittsburghCrimeData.xlsx')

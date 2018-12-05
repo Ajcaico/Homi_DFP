@@ -27,6 +27,8 @@ AlleghenyZipcodes = {'15101','15003','15005','15006','15007','15102','15014','15
                  '15239','15241','15243','15260','15290','15142','15075','15076','16055','15143',
                  '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
                  '15122','15089','15090','15148'}
+for x in AlleghenyZipcodes:
+    print(x)
 SchoolComplete = []
 AlleghenySchools = {}
 AlleghenySchoolZipAgg = {}
@@ -518,7 +520,7 @@ def printZipCodeColumn_M(zipcode):
     col_names = ['label', 'county score', 'local zip score']
     df = pd.DataFrame(listOfMetrics, columns = col_names)
     df = df.set_index('label')
-    #print(df)
+    print(df)
     
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -581,7 +583,6 @@ def ReturnAggregate_Rebase():
     maxAttend = df['BlendedScore'].max()
     maxFactor = maxAttend/5
     df['BlendedScore_rebase'] = df['BlendedScore'] /maxFactor
-    return df
 
 #Main Method
 def SchoolMainMethod_M():
@@ -624,10 +625,9 @@ def SchoolMainMethod_M():
 
 
 SchoolMainMethod_M()
+printMacroChart_M()
+printZipCodeColumn_M(15237)
 ReturnAggregate_Rebase()
-if (__name__ == '__main__'):
-    printMacroChart_M()
-    printZipCodeColumn_M(15237)
 
 
 # In[ ]:
