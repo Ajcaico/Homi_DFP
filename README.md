@@ -18,5 +18,6 @@ HomiUserInput.py - Gets user inputs for each category used to calculate overall 
 
 
 Running the code:
-execute getData() function from HomiUserInput.py file to get data from each data source - RUN ONLY ONCE then comment out, results will write to excel
+execute getData() function from HomiUserInput.py file to get data from each data source - RUN ONLY ONCE then comment out, results will write to excel.
+
 execute getUserInput() function to prompt for user input then perform calculations to determine top rated zip codes, additional prompts 
