@@ -7,7 +7,6 @@ Created on Mon Dec  3 21:48:31 2018
 # import individual data sources
 import YelpDataAPI as yd
 import CraigslistCode as cc
-import GetZipcodeRentalPricePlot as rp
 import ZillowHousingDataByZip as zd
 import ArrestData as ar
 import PASchoolPerf_Extraction as ed
@@ -46,7 +45,7 @@ aggregatedZipData.to_excel('Result.xlsx')
 # create dataframe for scores (0 - 5)
 zip_scores = aggregatedZipData[['BlendedScore_rebase','restaurantScore', 'barScore', 
                                 'groceryScore', 'housingPriceScore', 'CrimeScore']].round(1)
-
+zip_scores['CrimeScore'] = ((zip_scores['CrimeScore'] - 5)).abs()
 
 def getUserInput():
     print("Rate your importance for each category on a scale of 1-5 then press enter, 1 being not important and 5 being very important")
@@ -108,8 +107,20 @@ def getUserInput():
         except:
             print('Invalid input. Enter an integer between 1 and 5')  
     
+    validInput = False
+    while (not validInput):
+        try:
+            affordabilityInput = int(input("Affordability: ").strip())
+            if (affordabilityInput <= 5 and affordabilityInput > 0):
+                validInput = True
+            else:
+               raise Exception()
+        except:
+            print('Invalid input. Enter an integer between 1 and 5')  
+    
         
-    inputDict = {'education' : int(educationInput), 'crime': int(crimeInput), 'restaurant': int(restaurantInput), 'nightlife': int(nightlifeInput), 'grocery': int(groceryInput)}
+    inputDict = {'education' : int(educationInput), 'crime': int(crimeInput), 'restaurant': int(restaurantInput), 
+                 'nightlife': int(nightlifeInput), 'grocery': int(groceryInput), 'affordability': int(affordabilityInput)}
     return inputDict
 
 
@@ -123,7 +134,7 @@ def calculateOverallScore(inputDict):
     weightScores['barScore'] = weightScores['barScore']*inputDict['nightlife']
     weightScores['groceryScore'] = weightScores['groceryScore']*inputDict['grocery']
     weightScores['BlendedScore_rebase'] = weightScores['BlendedScore_rebase']*inputDict['education']
-    weightScores['housingPriceScore'] = weightScores['housingPriceScore']*4
+    weightScores['housingPriceScore'] = weightScores['housingPriceScore']*inputDict['affordability']
     #converting crime scores sp highest is the best safety rating
     weightScores['CrimeScore'] = (((weightScores['CrimeScore'] - 5) * -1)*inputDict['crime']).abs()
     
@@ -147,24 +158,25 @@ def calculateOverallScore(inputDict):
 
 def spyderChart(firstZip, secondZip, thirdZip):
     
-    
     # REFERENCE: https://python-graph-gallery.com/391-radar-chart-with-several-individuals/
+    # Set data
+    
     firstZipDF = zip_scores.loc[firstZip].T
     firstZipDF.reset_index(drop=True, inplace=True)
     
     secondZipDF = zip_scores.loc[secondZip].T
     secondZipDF.reset_index(drop=True, inplace=True)
     
-    thirdZipDF = zip_scores.loc[thirdZip].T
+    thirdZipDF = zip_scores.loc['15216'].T
     thirdZipDF.reset_index(drop=True, inplace=True)
-    
+    print(thirdZipDF)
     
 
     # ------- PART 1: Create background
      
     # number of variable
     categories=['Education','Restaurants', 'NightLife', 
-                                'Groceries', 'Housing', 'Safety']
+                                'Groceries', 'Affordability', 'Safety']
     N = len(categories)
      
     # What will be the angle of each axis in the plot? (we divide the plot / number of variable)
@@ -219,12 +231,12 @@ def showGraphs(zipcode):
     
     if zipcode == 'all':
         yd.getMacroChart()
-        cc.getOverallAggregateData(cc.getData())
+        cc.getOverallAggregateData()
         ed.printMacroChart_M()
     
     else:
         yd.getMicroChart(str(zipcode))
-        rp.getZipcodePlot(int(zipcode))
+        cc.getZipcodePlot(int(zipcode))
         ed.printZipCodeColumn_M(zipcode)
     
     
@@ -261,8 +273,6 @@ while(viewGraph == 'Y'):
                 print('Invalid input. Enter a valid 5 digit Pittsburgh zip code')  
        
 
-viewGraph = 'Y'
-while(viewGraph == 'Y'):
     validInput = False
     while (not validInput):
             viewGraph = input('Do you want to see overall details for Pittsburgh? Type Y or N \n').strip()

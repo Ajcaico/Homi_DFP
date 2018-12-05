@@ -160,7 +160,7 @@ df['medSalePerBed'] = df['medSalePerBed'].fillna(value=min(df['medSalePerBed']))
 
 df['housingPriceScore'] = (1.0 - round((df['housingPriceScore'] / MaxPPSF), 1)).abs() * 5
 
-print(df['housingPriceScore'])
+
 
 #function to return zillowDataDictionary when called from main file
 def zillowData():
@@ -174,8 +174,7 @@ def housingHeatMap():
     lng = np.array(df['LNG'].tolist())
     prices = np.array(df['medSalePerBed'].tolist())
     data = pd.DataFrame(data={'x':lat, 'y':lng, 'z':prices})
-    data = data.dropna(how='any',axis=0) 
-    print(data)
+    data = data.dropna(how='any',axis=0)
     data = data.pivot(index='x', columns='y', values='z')
     
     sns.heatmap(data)
