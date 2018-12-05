@@ -17,6 +17,8 @@ average scores across all zipcodes, filling in for zipcodes that provide no
 school data.  It generates a chart for specific zip codes as well as for 
 overall Allegheny School statistics.
 
+The file is imported into HomiUserInput.py
+
 
 '''
 

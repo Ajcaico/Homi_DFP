@@ -47,6 +47,11 @@ zip_scores = aggregatedZipData[['BlendedScore_rebase','restaurantScore', 'barSco
                                 'groceryScore', 'housingPriceScore', 'CrimeScore']].round(1)
 zip_scores['CrimeScore'] = ((zip_scores['CrimeScore'] - 5)).abs()
 
+
+#Get data from Yelp - ONLY RUN ONCE to generate data to excel then comment out
+#yd.getData()
+
+
 def getUserInput():
     print("Rate your importance for each category on a scale of 1-5 then press enter, 1 being not important and 5 being very important")
    
@@ -233,11 +238,13 @@ def showGraphs(zipcode):
         yd.getMacroChart()
         cc.getOverallAggregateData()
         ed.printMacroChart_M()
+      
     
     else:
         yd.getMicroChart(str(zipcode))
         cc.getZipcodePlot(int(zipcode))
         ed.printZipCodeColumn_M(zipcode)
+        ar.microCrimeStats(zipcode)
     
     
 #Start calling functions 
@@ -273,15 +280,15 @@ while(viewGraph == 'Y'):
                 print('Invalid input. Enter a valid 5 digit Pittsburgh zip code')  
        
 
-    validInput = False
-    while (not validInput):
-            viewGraph = input('Do you want to see overall details for Pittsburgh? Type Y or N \n').strip()
-            if (viewGraph == 'Y'):
-                validInput = True
-                showGraphs('all')
-            elif (viewGraph == 'N'):
-                validInput = True
-            else:
-               print('Invalid input. Enter Y or N') 
+validInput = False
+while (not validInput):
+    viewGraph2 = input('Do you want to see overall details for Pittsburgh? Type Y or N \n').strip()
+    if (viewGraph2 == 'Y'):
+        validInput = True
+        showGraphs('all')
+    elif (viewGraph2 == 'N'):
+        validInput = True
+    else:
+       print('Invalid input. Enter Y or N') 
  
             
