@@ -4,17 +4,30 @@
 # In[1]:
 
 
-#Daniel Lesser Public PA School Data import
 
-#NotebookApp.iopub_data_rate_limit=10000000.0 (bytes/sec)
-#NotebookApp.rate_limit_window=10.0 (secs)
+'''
+File Name: PASchoolPerf_Extraction.py
+Group Members: Daniel Lesser, Amanda Baker, Coulton Mouritson, Joseph
+Standerfer, Alex Caico
+
+This program loads in 2 txt files containing data on public schools in 
+Pennsylvania.  It reduces those files to Allegheny County zip codes.  It creates
+a dictionary for each zip code and adds that that dataframe.  It then calculates
+average scores across all zipcodes, filling in for zipcodes that provide no
+school data.  It generates a chart for specific zip codes as well as for 
+overall Allegheny School statistics.
+
+
+'''
+
+#Import packages
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
+#Set up global variables
 schools = {}
-#columns = []
 AlleghenyZipcodes = {'15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
                  '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
                  '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
@@ -32,6 +45,7 @@ AlleghenySchools = {}
 AlleghenySchoolZipAgg = {}
 AlleghenySchoolAvgsDict = {}
 
+#Read data in from the two .txt files and reads them into a schools dictionary
 def ReadFiles_M():
     fin = open("SPP.APD.2016.2017.txt", "rt", encoding = 'utf-8')
     if(fin.mode == 'rt'):
@@ -122,8 +136,9 @@ def SchoolListList_M():
 #School Enrollment #Index[56]
 #School Zip Code #Index[57]
 
+#method for giving 1 row per zip code of all relevant attributes by combining
+#the scores across all schools in the zip code
 def ZipAgg_M():
-    #method for giving 1 row per zip code of all relevant attributes.
 
     for zip in AlleghenyZipcodes:
         localSchools = {}
@@ -372,8 +387,9 @@ def ZipAgg_M():
                 'BlendedScore': BlendedScore} 
             
 ####################################################################################            
-    AlleghenySchoolZipAgg_DF = pd.DataFrame(AlleghenySchoolZipAgg).T            
+    #AlleghenySchoolZipAgg_DF = pd.DataFrame(AlleghenySchoolZipAgg).T            
 
+#Calculates the average for allegheny county overall for select metrics
 def AlleghenySchoolAvgs_M():
     
     totalAttend = 0
@@ -458,7 +474,7 @@ def AlleghenySchoolAvgs_M():
             'Num_Gifted': 0, 'Avg_Enroll': 0, 'School_Count': 0,
             'BlendedScore': totalBlend}
 
-
+#creates a chart for overall allegheny county.
 def printMacroChart_M():
 
     blendScore = []
@@ -474,8 +490,8 @@ def printMacroChart_M():
     plt.show()
     
     
-#not working atm.  Want to create several column charts with the zipcode's avg
-#and the avg for all of allegheny county    
+#creates a chart comparing the local zipcode to the average scores for 
+#allegheny county
 def printZipCodeColumn_M(zipcode):
     zip = zipcode
     df = ReturnAggregate()
@@ -506,18 +522,18 @@ def printZipCodeColumn_M(zipcode):
     avgMath = AlleghenySchoolAvgs_NpArray[4][1]
     avgScience = AlleghenySchoolAvgs_NpArray[5][1]   
     
-    listAttend = ['Attendance', float(avgAttend), float(localAttend)]
-    listBlend = ['Blended', float(avgBlend), float(localBlend)]
-    listEcon = ['Econ. Disadvatange', float(avgEconDis)*100, float(localEcon)*100]
+    listAttend = ['Attendance Rate', float(avgAttend), float(localAttend)]
+    listBlend = ['Blended Score', float(avgBlend), float(localBlend)]
+    listEcon = ['Econ. Disadvantange', float(avgEconDis)*100, float(localEcon)*100]
     listLit = ['Lit Scores', float(avgLit), float(localLit)]
     listMath = ['Math Scores', float(avgMath), float(localMath)]
     listScience = ['Science Scores', float(avgScience), float(localScience)]
     
     listOfMetrics = [listBlend, listAttend, listEcon, listLit, listMath, listScience]
     
-    col_names = ['label', 'county score', 'local zip score']
+    col_names = ['', 'county score', 'local zip score']
     df = pd.DataFrame(listOfMetrics, columns = col_names)
-    df = df.set_index('label')
+    df = df.set_index('')
     #print(df)
     
     fig = plt.figure()
@@ -536,7 +552,7 @@ def printZipCodeColumn_M(zipcode):
     plt.title("Allegheny County vs. Local School Metrics")
     plt.show()
      
-    
+#function to print the data to an excel file
 def printToExcel_M():
     df = pd.DataFrame(AlleghenySchoolZipAgg).T
     df.to_excel('AggregateData.xlsx')
@@ -545,7 +561,7 @@ def printToExcel_M():
     df2.to_excel('CompleteData.xlsx')
 
 
-
+#For testing purposes only
 def testPrintStatements():
     print("done with local schools")
     print("Allegheny School Count:", len(AlleghenySchools))
@@ -573,9 +589,13 @@ def testPrintStatements():
     #print("PA School Count:", len(schools))
     #print("Allegheny School Count:", len(AlleghenySchools)) 
 
+#Returns a dataframe with average scores, by zip code
 def ReturnAggregate():
     return pd.DataFrame(AlleghenySchoolZipAgg).T
 
+
+#returns a dataframe with a rebased blended school score for use in the 
+#HomiUserInput file
 def ReturnAggregate_Rebase():
     df = pd.DataFrame(AlleghenySchoolZipAgg).T
     maxAttend = df['BlendedScore'].max()
@@ -583,7 +603,7 @@ def ReturnAggregate_Rebase():
     df['BlendedScore_rebase'] = df['BlendedScore'] /maxFactor
     return df
 
-#Main Method
+#Main Method to run KEY methods
 def SchoolMainMethod_M():
     ReadFiles_M()
     NarrowAllegheny_M()
@@ -592,37 +612,9 @@ def SchoolMainMethod_M():
     AlleghenySchoolAvgs_M()
 #    printToExcel_M()
 
-
-# In[ ]:
-
-
-##openpyxl version.  Pandas a lot easier!
-#don't use this code
-
-#import openpyxl as op
-#wb = op.Workbook()
-
-#Create 2 tabs
-#ws1 = wb.create_sheet("Complete_data")
-#ws2 = wb.create_sheet("Aggregate_data")
-
-#Writing to aggregate data tab
-#ws2 = wb.active
-#for key,value in AlleghenySchoolZipAgg.items():
-    
-    
-#    print("Zipcode: ", key)
-#    print("Academic Score: ", value['AttendanceRate'], "Blended: ", value['Calc_Score'])
-
-#wb.save('SchoolsData.xlsx')
-
-
-#wb[ws1]['B4'] = "testing"
-
-
 # In[3]:
 
-
+#runs the program
 SchoolMainMethod_M()
 ReturnAggregate_Rebase()
 if (__name__ == '__main__'):
