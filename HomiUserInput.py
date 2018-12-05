@@ -147,9 +147,8 @@ def calculateOverallScore(inputDict):
 
 def spyderChart(firstZip, secondZip, thirdZip):
     
-    # REFERENCE: https://python-graph-gallery.com/391-radar-chart-with-several-individuals/
-    # Set data
     
+    # REFERENCE: https://python-graph-gallery.com/391-radar-chart-with-several-individuals/
     firstZipDF = zip_scores.loc[firstZip].T
     firstZipDF.reset_index(drop=True, inplace=True)
     

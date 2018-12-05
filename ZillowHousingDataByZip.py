@@ -158,8 +158,9 @@ df['medSalePPSF'] = df['medSalePPSF'].fillna(value=min(df['medSalePPSF']))
 df['housingPriceScore'] = df['housingPriceScore'].fillna(value=min(df['housingPriceScore']))
 df['medSalePerBed'] = df['medSalePerBed'].fillna(value=min(df['medSalePerBed']))
 
-df['housingPriceScore'] = round((df['housingPriceScore'] / MaxPPSF) * 5, 1)
+df['housingPriceScore'] = (1.0 - round((df['housingPriceScore'] / MaxPPSF), 1)).abs() * 5
 
+print(df['housingPriceScore'])
 
 #function to return zillowDataDictionary when called from main file
 def zillowData():
@@ -221,7 +222,6 @@ if __name__ == '__main__':
     
 #    for i in zillowPriceDict:
 #        print(i,zillowPriceDict[i])
-    
     zillowBarChart('15232', '15133', '15063', '15090')
     # write dictionary to csv
     df.to_excel('ZipCodeMedHousingPrice.xlsx')
