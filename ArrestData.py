@@ -1,8 +1,15 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[139]:
+# In[149]:
 
+
+# Team 5: Amanda Baker, Alex Caico, Colton Mouritsen, Daniel Lesser, Joseph Standefer
+# Filename: ArrestData.py 
+# This code scrapes data from the WPRDC website on Pittsburgh crimes reported, by zipcode.
+# The code then takes the data and transforms it into counts of certain crimes types (such as assault, robbery, drug possession)
+# and returns a dataframe with counts of each per zip code, plus an aggregate score based on weighted crime values.
+# This file is imported by the main module AggregateData.py (import ArrestData as ar)
 
 import requests, zipfile, io, csv
 import pandas as pd
@@ -97,20 +104,23 @@ dfM = dfM.fillna(0)
 dfM['CrimeScoreP'] = (dfM['SIMP_ASSAULT_CRIME']*.2) + (dfM['AGGV_ASSAULT_CRIME']*.6) + (dfM['DRUG_CRIME']*.05) + (dfM['ROBBERY_CRIME']*.15)
 dfM['CrimeScore'] = (dfM['CrimeScoreP']/(dfM['CrimeScoreP'].max()))*5
 
-
+# returns the dataframe with arrest statistics
 def arrestData():
     return dfM
 
+# returns a dataframe with just the zipcodes and their crime score
 def arrestDataScore():
     # dropping all columns and keeping just the crime score
     #dfM.drop(['ASSAULT_CRIME','SIMP_ASSAULT_CRIME','AGGV_ASSAULT_CRIME','DRUG_CRIME','ROBBERY_CRIME','ALL_CRIME','CrimeScoreP'], axis=1, inplace=True)
     return dfM
 
-
+# shows a bar chart for all zipcodes and corresponding crime scores
 def macroCrimeStats():
     dfC = dfM[dfM['CrimeScore'] != 0]
     dfChart = dfC.plot.bar( y='CrimeScore', rot=0)
+    plt.show()
     
+# shows a bar chart for a specific zip code, across the measures of total reported crimes, assault counts, possession crime counts, and robbery crime counts    
 def microCrimeStats(zipcode):
     listTotalCrime = ['Total Crime', (dfM['ALL_CRIME'].loc[str(zipcode)])]
     listAssault = ['Assaults', (dfM['ASSAULT_CRIME'].loc[str(zipcode)])]
@@ -138,6 +148,7 @@ def microCrimeStats(zipcode):
     plt.show()
     
 
+    
 if __name__ == '__main__':         
     # write dictionary to csv
     dfM.to_excel('AggregatedPittsburghCrimeData.xlsx')
