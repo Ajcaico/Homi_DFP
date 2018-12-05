@@ -7,10 +7,7 @@ Created on Fri Nov  9 19:02:49 2018
 from __future__ import print_function
 import argparse
 import requests
-import sys
-import urllib
 from urllib.parse import quote
-from urllib.parse import urlencode
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -18,27 +15,31 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 
+#Sends Yelp API requests, which returns JSONs for each business that meets the search criteria
+#Retrieves necessary data from JSONs and creates a dataframe, which is written to excel
+#Creates graph based data cleaned data from Yelp responses
 
+#Credit: Yelp API functions (request, search, get_business, and query_api) taken from Yelp developer github. 
+#These functions were copied and adjusted to fit the needs for this program
+#https://github.com/Yelp/yelp-fusion/tree/master/fusion/python
+
+
+#Yelp API keys required for sending requests, 5,000 limit per day. Switch to other API_KEY if limit is reached
 API_KEY= 'ag6RO1gG16UhJzSO-88XdFrpzaNgOpUwaxOkkXco4QvyOXyAdkyih7yGiq5iIGCbZ6rsSPJedkakFpeX0rZGeUfAr7zuWsXkwT6XCZGYSKi2ntPRsJkV00anQCjmW3Yx' 
-
 #API_KEY = 'Zuso4ntCFv_QaB4i4a6K4j0R0meRcdJ6Lum873qy36Y6gN2diK9iCLlnqFX-GYtWH5fSN-I8NUFYhTyTcx8PhamgxYkCSD4MkmJ4lzTasDn99cWZjV9f9bgLFHD0W3Yx'
 
 
-# API constants, you shouldn't have to change these.
+# API constants
 API_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
-BUSINESS_PATH = '/v3/businesses/'  # Business ID will come after slash.
-
-# Defaults for our simple example.
+BUSINESS_PATH = '/v3/businesses/' 
 SEARCH_LIMIT = 40
 
 zip_summary = {}
 result_list = []
 
-
+#Search terms
 category_list = ['American', 'Asian', 'Latin', 'Indian', 'Bar', 'Grocery']
-
-
 zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104','15015','15017',
                 '15018','15020','15106','15024','15025','15026','15108','15028','15030','15046',
                 '15031','15034','15110','15035','15112','15037','15332','15044','15045','15116',
@@ -52,25 +53,13 @@ zipcode_list = ['15101','15003','15005','15006','15007','15102','15014','15104',
                 '15129','15144','15082','15084','15085','15145','16059','15147','15086','15088',
                 '15122','15089','15090','15148']
 
-'''
-#excluding zip codes that have no responses
-zipcode_list = ['15101','15003','15005','15102','15014','15104','15017','15020','15106','15024','15025','15026','15108','15030','15046',
-'15031','15110','15035','15112','15037','15332','15044','15045','15116','15120','15126','15642','15056','16046','15057',
-'15136','15131','15132','15133','15135','15063','15146','15668','15065','15068','15137','15071','15139','15201','15202',
-'15203','15205','15206','15207','15208','15209','15210','15211','15212','15213','15214','15215','15216','15217','15218',
-'15219','15220','15221','15222','15223','15224','15225','15226','15227','15228','15229','15232','15233','15234','15235',
-'15236','15237','15238','15239','15241','15075','15076','16055','15143','15129','15144','15082','15084','15085','15145',
-'16059','15147','15086','15088','15122','15089','15090','15148']
-'''
 
-#zipcode_list = ['15221']
-#category_list = ['American', 'Asian']
-
-
+#Method to generate API requests and create spreadsheets with data generated
 def getData():
     
     print('Starting Yelp API requests')
     totalRequests = len(zipcode_list) * len(category_list)
+    print('Approximately 3-5 minutes for each 100 API requests')
     print(str(totalRequests) + ' API requests will be made')
     
     count = 0
@@ -99,8 +88,8 @@ def getData():
     
     return df_summaryTop
 
-def request(host, path, api_key, url_params=None):
 
+def request(host, path, api_key, url_params=None):
     url_params = url_params or {}
     url = '{0}{1}'.format(host, quote(path.encode('utf8')))
     headers = {
@@ -110,8 +99,8 @@ def request(host, path, api_key, url_params=None):
     response = requests.request('GET', url, headers=headers, params=url_params)
     return response.json()
 
-def search(api_key, term, location):
 
+def search(api_key, term, location):
     url_params = {
         'term': term.replace(' ', '+'),
         'location': location.replace(' ', '+'),
@@ -121,13 +110,10 @@ def search(api_key, term, location):
 
 
 def get_business(api_key, business_id):
-
     business_path = BUSINESS_PATH + business_id
     return request(API_HOST, business_path, api_key)
 
 def query_api(term, location):
-
-
     response = search(API_KEY, term, location)
     businesses = response.get('businesses')
 
@@ -140,6 +126,7 @@ def query_api(term, location):
 
     return businesses
 
+#Go through JSONs returned be API and pull out data needed into a list of lists
 def addResultsToList(businesses, location, category):
     
     if businesses is not None:
@@ -155,7 +142,7 @@ def addResultsToList(businesses, location, category):
               result = [businessZip, category, i.get('name'), i.get('rating'), i.get('review_count') ]
               result_list.append(result)
            
-
+#convert lists to pandas data frame
 def resultsToDataFrame():
     
     col_names = ['zipcode', 'category', 'name', 'rating', 'review']
@@ -166,18 +153,18 @@ def resultsToDataFrame():
     print('AllYelpData.xlsx updated')
     return df
     
-    
+
+#get summary level data for raw data acorss zips
 def getSummaryData(df):
   
     summaryResultList = []   
     df['zipcode'] = (df['zipcode']).astype(int)
     df['rating_reviews'] = df['rating']*df['review'] 
     
-    
+
     for zipcode in zipcode_list:
         
         #summary across all restaurant categories in a zip
-       
         df_filteredAll = df[(df.category != 'Bar') & (df.category != 'Grocery') & (df.zipcode == int(zipcode))] 
         count = df_filteredAll['rating'].count()
         ratingAverage = df_filteredAll['rating_reviews'].sum() / df_filteredAll['review'].sum() 
@@ -194,10 +181,8 @@ def getSummaryData(df):
             summaryResult = [str(zipcode), category, count, ratingAverage, reviewCountAverage]
             summaryResultList.append(summaryResult)
             
-    
     col_names = ['zipcode', 'category', 'count', 'average_rating', 'average_review_count']
     df_summary = pd.DataFrame(summaryResultList, columns = col_names)
- #  df_summary = df_summary.set_index('zipcode')
  
     df_summary.to_excel('YelpSummaryData.xlsx') 
     print('YelpSummaryData.xlsx updated')
@@ -209,12 +194,12 @@ def getSummaryData(df):
     
     return {'topSummary': df_summaryTop, 'summary': df_summary}
  
-
-
+    
+#calculate rating for each zip code
 def calculateRating(df, df_summary):
     
     ratings = []
-    #determine variety of restuarant types
+    #determine variety of restaurant types
     for zipcode in zipcode_list:
         df_filtered = df[df.zipcode == int(zipcode)]
         counts = df_filtered['category'].value_counts().to_dict()
@@ -255,6 +240,7 @@ def calculateRating(df, df_summary):
     df_ratings.to_excel('YelpOverallRating.xlsx') 
     return df_ratings
 
+#returns simple form of ratings to use for weighted calculation
 def getOverallRating():
     df_yelpOverallScore = pd.read_excel('YelpOverallRating.xlsx')
     df_yelpOverallScore = df_yelpOverallScore[['zipcode', 'restaurantScore', 'barScore', 'groceryScore']]
@@ -263,7 +249,8 @@ def getOverallRating():
     df_yelpOverallScore['barScore'] = df_yelpOverallScore['barScore'].fillna(value=0)
     df_yelpOverallScore['groceryScore'] = df_yelpOverallScore['groceryScore'].fillna(value=0)
     return df_yelpOverallScore
-        
+
+#Get data from excel after intial API calls have been made, instead of making new API calls
 def getDatafromExcel():
     
     df_yelpSummaryTop = pd.read_excel('YelpSummaryTop.xlsx')
@@ -273,16 +260,13 @@ def getDatafromExcel():
     df_allYelpData = df_allYelpData.set_index('zipcode')
     
     df_yelpSummary = pd.read_excel('YelpSummaryData.xlsx')
-  #  df_yelpSummary = df_yelpSummary.set_index('zipcode')
     
     df_yelpOverallScore = pd.read_excel('YelpOverallRating.xlsx')
     df_yelpOverallScore = df_yelpOverallScore.set_index('zipcode')
     
-  #  print('Retrieved Yelp Data from Excel')
     return {'allData' : df_allYelpData, 'summaryData': df_yelpSummary, 'topSummaryData' : df_yelpSummaryTop, 'overallScore' : df_yelpOverallScore}
     
-
-
+#generate pittsburgh stats charts
 def getMacroChart():
     
     dataDict = getDatafromExcel()
@@ -313,7 +297,7 @@ def getMacroChart():
     plt.show()
     
     
-    
+#generate zipcode specific charts
 def getMicroChart(zipcode):
     
     dataDict = getDatafromExcel()
@@ -321,7 +305,6 @@ def getMicroChart(zipcode):
     df_count = df[(df.zipcode == int(zipcode)) & (df.category != 'All Restaurants')]
     df_count = df_count[['category', 'count', 'average_rating']]
     df_count=df_count.set_index('category')
-    
     
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -337,20 +320,18 @@ def getMicroChart(zipcode):
     ax.set_title('Restaurants by Count and Rating for Zip Code: ' + str(zipcode))
     plt.show()
 
-
 '''    
     key1 = patches.Patch(color = 'skyblue', label = 'Count')
     key2 = patches.Patch (Color = 'navy', label = 'Rating')
     plt.legend(handles = [key1, key2])
  '''   
     
-    
 
 def main():
  
-    getData()
+  #  getData()
     getMacroChart()
-    getMicroChart('15222')
+    getMicroChart('15000')
 
     
 if __name__ == '__main__':
