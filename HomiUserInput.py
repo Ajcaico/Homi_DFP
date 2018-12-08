@@ -49,7 +49,7 @@ zip_scores['CrimeScore'] = ((zip_scores['CrimeScore'] - 5)).abs()
 
 
 #Get data from Yelp - ONLY RUN ONCE to generate data to excel then comment out
-#yd.getData()
+yd.getData()
 
 
 def getUserInput():
